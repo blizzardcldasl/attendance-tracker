@@ -986,7 +986,7 @@ async function saveConfigToSheet(){
 
 // Build stamp — bump when shipping fixes so the deployed page can be verified.
 // Visible at the bottom of the Settings panel and logged to console on load.
-const APP_BUILD = '2026-04-29-d';
+const APP_BUILD = '2026-04-29-e';
 
 // =========== AUTH ===========
 function initAuth(){
@@ -1048,18 +1048,13 @@ function signIn(forceSwitch){
     setSync('err', 'Init failed: ' + (e.message || 'unknown'));
   }
 }
-// Switch-account flow: revoke the existing token so Google can't silently
-// re-grant the same identity, then re-auth with prompt:'select_account'.
-async function switchAccount(){
-  if (token){
-    try {
-      await fetch('https://oauth2.googleapis.com/revoke?token=' + encodeURIComponent(token),
-        {method: 'POST'});
-      console.log('[OAuth] revoked previous token');
-    } catch (e){
-      console.warn('[OAuth] revoke failed (non-fatal):', e);
-    }
-  }
+// Switch-account flow: just re-auth with prompt:'select_account'. We do
+// NOT revoke the existing token first — revoking forces a re-consent flow,
+// which hits the OAuth Consent Screen "test users" restriction every time
+// for apps using sensitive scopes (like Sheets) in Testing mode and
+// triggers "Access blocked: Authorization Error". Letting Google reuse
+// the existing consent and just swap the account is the right move.
+function switchAccount(){
   token = null;
   signIn(true);
 }
