@@ -451,11 +451,11 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
       <div class="ss-group">
         <h4>Account &amp; sync</h4>
         <div class="ff" style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn-bulk ghost" id="cfgSwitchAccount" type="button" style="flex:1;min-width:140px;">Switch Google account</button>
+          <button class="btn-bulk ghost" id="cfgSwitchAccount" type="button" style="flex:1;min-width:140px;">Sign out &amp; switch account</button>
           <button class="btn-bulk ghost" id="cfgCopyLink" type="button" style="flex:1;min-width:140px;">Copy setup link</button>
         </div>
         <small style="display:block;margin-top:4px;color:var(--muted2);font-size:11px;line-height:1.55;">
-          <strong>Switch account:</strong> forces Google's account picker for users with multiple Google sessions.<br>
+          <strong>Sign out &amp; switch:</strong> opens Google's sign-out in a new tab. After signing out, return here and click Sign In — Google will then show the account picker. Necessary because Google's OAuth library silently picks the active session even when asked for a picker.<br>
           <strong>Copy setup link:</strong> generates a URL with your Sheet ID + Client ID embedded — paste it in another browser to auto-fill those two fields. Tracking prefs (start, target, country, custom holidays) sync separately via a hidden <code>_Config</code> tab in your Sheet.
         </small>
       </div>
@@ -986,7 +986,7 @@ async function saveConfigToSheet(){
 
 // Build stamp — bump when shipping fixes so the deployed page can be verified.
 // Visible at the bottom of the Settings panel and logged to console on load.
-const APP_BUILD = '2026-04-29-e';
+const APP_BUILD = '2026-04-29-f';
 
 // =========== AUTH ===========
 function initAuth(){
@@ -1048,15 +1048,31 @@ function signIn(forceSwitch){
     setSync('err', 'Init failed: ' + (e.message || 'unknown'));
   }
 }
-// Switch-account flow: just re-auth with prompt:'select_account'. We do
-// NOT revoke the existing token first — revoking forces a re-consent flow,
-// which hits the OAuth Consent Screen "test users" restriction every time
-// for apps using sensitive scopes (like Sheets) in Testing mode and
-// triggers "Access blocked: Authorization Error". Letting Google reuse
-// the existing consent and just swap the account is the right move.
+// Switch-account flow: GIS's prompt:'select_account' silently picks the
+// active Google session in most browser/account configs (a known limitation
+// of the Token Client API). The reliable workaround is to have the user
+// sign out of Google in a separate tab — once there's no active session,
+// the next sign-in is forced to show the account picker.
 function switchAccount(){
+  if (!confirm(
+    'To switch Google accounts:\n\n' +
+    '1. A new tab opens to Google\'s sign-out page\n' +
+    '2. Sign out of all accounts there\n' +
+    '3. Come back to this tab and click Sign In\n' +
+    '4. Google will then show the account picker\n\n' +
+    'You can sign back in to your other accounts in the new tab after.\n\n' +
+    'Continue?'
+  )) return;
   token = null;
-  signIn(true);
+  hideBanner();
+  // Stage the UI so the user can sign in once they come back.
+  showBanner(
+    '<strong>Step 2 of 2:</strong> sign out in the other tab, then click ' +
+    'Sign In below. <button id="bSignIn">Sign In</button>'
+  );
+  g('bSignIn').onclick = () => signIn();
+  setSync('err', 'Sign out, then Sign In');
+  window.open('https://accounts.google.com/Logout', '_blank', 'noopener');
 }
 
 // =========== ACTIONS (optimistic) ===========
