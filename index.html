@@ -448,6 +448,17 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
           <small>One per line: <code>YYYY-MM-DD &lt;optional name&gt;</code>. Adds to the country preset above.</small>
         </div>
       </div>
+      <div class="ss-group">
+        <h4>Account &amp; sync</h4>
+        <div class="ff" style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-bulk ghost" id="cfgSwitchAccount" type="button" style="flex:1;min-width:140px;">Switch Google account</button>
+          <button class="btn-bulk ghost" id="cfgCopyLink" type="button" style="flex:1;min-width:140px;">Copy setup link</button>
+        </div>
+        <small style="display:block;margin-top:4px;color:var(--muted2);font-size:11px;line-height:1.55;">
+          <strong>Switch account:</strong> forces Google's account picker for users with multiple Google sessions.<br>
+          <strong>Copy setup link:</strong> generates a URL with your Sheet ID + Client ID embedded — paste it in another browser to auto-fill those two fields. Tracking prefs (start, target, country, custom holidays) sync separately via a hidden <code>_Config</code> tab in your Sheet.
+        </small>
+      </div>
     </div>
     <div class="settings-foot">
       <button class="btn-bulk ghost" id="cfgReset" type="button">Reset to defaults</button>
@@ -873,6 +884,10 @@ async function loadSheet(){
     entries = next;
     setSync('ok','Synced ✓');
     render();
+    // After entries load, fetch the hidden _Config tab so preferences sync
+    // across browsers. Failure is non-fatal — first run on this sheet just
+    // means the tab doesn't exist yet.
+    loadConfigFromSheet().then(loaded => { if (loaded) render(); }).catch(()=>{});
   } catch (e){
     console.error(e);
     setSync('err','Sync error');
@@ -908,6 +923,66 @@ async function clearRow(row){
   await shReq('POST', `/values/${enc(CONFIG.sheetTab + '!A' + row + ':E' + row)}:clear`, null);
 }
 
+// =========== HIDDEN CONFIG TAB SYNC ===========
+// Stores user preferences (start date, target %, country, custom holidays)
+// in a hidden "_Config" tab on the same Sheet so they follow the user across
+// browsers/devices. Sheet ID and Client ID stay LOCAL (chicken-and-egg —
+// can't read the sheet without them).
+const CONFIG_TAB = '_Config';
+
+async function ensureConfigSheet(){
+  try {
+    await shReq('GET', `/values/${enc(CONFIG_TAB + '!A1')}?valueRenderOption=UNFORMATTED_VALUE`);
+    return true;
+  } catch (e){
+    try {
+      await shReq('POST', ':batchUpdate', {
+        requests: [{addSheet: {properties: {title: CONFIG_TAB, hidden: true}}}]
+      });
+      await shReq('PUT',
+        `/values/${enc(CONFIG_TAB + '!A1')}?valueInputOption=RAW`,
+        {values: [['Tracker config — managed by the app, do not edit.']]});
+      return true;
+    } catch (e2){
+      console.error('Could not create _Config sheet', e2);
+      return false;
+    }
+  }
+}
+async function loadConfigFromSheet(){
+  try {
+    const r = await shReq('GET',
+      `/values/${enc(CONFIG_TAB + '!A2')}?valueRenderOption=UNFORMATTED_VALUE`);
+    const raw = r?.values?.[0]?.[0];
+    if (!raw) return false;
+    const remote = JSON.parse(String(raw));
+    if (!remote || typeof remote !== 'object') return false;
+    const updates = {};
+    for (const k of ['startDate','targetPct','country','customHolidays']){
+      if (remote[k] != null) updates[k] = remote[k];
+    }
+    if (Object.keys(updates).length){ saveConfigToStorage(updates); }
+    return true;
+  } catch (e){
+    return false;
+  }
+}
+async function saveConfigToSheet(){
+  if (!token) return false;
+  const ok = await ensureConfigSheet();
+  if (!ok) return false;
+  const payload = {
+    startDate:      CONFIG.startDate,
+    targetPct:      CONFIG.targetPct,
+    country:        CONFIG.country,
+    customHolidays: CONFIG.customHolidays || ''
+  };
+  await shReq('PUT',
+    `/values/${enc(CONFIG_TAB + '!A2')}?valueInputOption=RAW`,
+    {values: [[JSON.stringify(payload)]]});
+  return true;
+}
+
 // =========== AUTH ===========
 function initAuth(){
   render(); // paint empty calendar before sign-in
@@ -939,11 +1014,16 @@ function signIn(){
   google.accounts.oauth2.initTokenClient({
     client_id: CONFIG.clientId, scope: SCOPE,
     callback: r => {
-      if (r.error){ setSync('err','Sign in failed'); return; }
+      if (r.error){ setSync('err','Sign in failed'); console.error('OAuth error', r); return; }
       token = r.access_token; hideBanner(); loadSheet();
     }
-  }).requestAccessToken();
+  // Force the account picker every time. Google's default auto-picks the
+  // most recently used session, making it impossible to switch between
+  // multiple Google accounts on one device.
+  }).requestAccessToken({prompt: 'select_account consent'});
 }
+// Settings-panel "Switch account" entry point.
+function switchAccount(){ token = null; signIn(); }
 
 // =========== ACTIONS (optimistic) ===========
 // Mutate `entries[k]` first, render, then sync. On failure: revert + render + flag error.
@@ -1281,7 +1361,7 @@ function openSettings(){
   setTimeout(() => g('cfgSheetId').focus(), 50);
 }
 function closeSettings(){ g('settingsOverlay').classList.remove('show'); }
-function handleSaveSettings(){
+async function handleSaveSettings(){
   const sheetId        = g('cfgSheetId').value.trim();
   const sheetTab       = g('cfgSheetTab').value.trim() || 'Tracker';
   const clientId       = g('cfgClientId').value.trim();
@@ -1292,7 +1372,6 @@ function handleSaveSettings(){
   if (!startDate || !/^\d{4}-\d{2}-\d{2}$/.test(startDate)){ alert('Start date must be YYYY-MM-DD.'); return; }
   if (!isFinite(targetPct) || targetPct < 1 || targetPct > 100){ alert('Target % must be 1–100.'); return; }
   if (!COUNTRY_RULES[country]){ alert('Unknown country. Pick one from the list.'); return; }
-  // Validate custom-holidays lines so a typo doesn't silently exclude the wrong day
   const badLines = [];
   for (const raw of customHolidays.split('\n')){
     const line = raw.trim();
@@ -1302,10 +1381,42 @@ function handleSaveSettings(){
   if (badLines.length){
     if (!confirm(`These custom-holiday lines don't start with YYYY-MM-DD and will be ignored:\n\n${badLines.slice(0,5).join('\n')}\n\nSave anyway?`)) return;
   }
+  // Did sheet/auth identity change? Only those need a full reload.
+  const needsReload = (sheetId !== CONFIG.sheetId) || (clientId !== CONFIG.clientId) || (sheetTab !== CONFIG.sheetTab);
   saveConfigToStorage({sheetId, sheetTab, clientId, startDate, targetPct, country, customHolidays});
+  console.log('[settings] saved', {sheetId: !!sheetId, clientId: !!clientId, sheetTab, startDate, targetPct, country, customHolidaysLen: customHolidays.length});
   closeSettings();
-  // Reload so OAuth re-initializes against the new client_id and the sheet re-loads.
-  location.reload();
+  if (needsReload){
+    // Show a brief flash so the user knows the save worked before the reload wipes the page.
+    setSync('ok','Settings saved — reloading…');
+    setTimeout(() => location.reload(), 700);
+    return;
+  }
+  // Same Sheet/account — keep the session, sync prefs to remote, re-render.
+  setSync('busy','Saving settings…');
+  try {
+    if (token){ await saveConfigToSheet(); }
+    setSync('ok','Settings saved ✓');
+  } catch (e){
+    console.error('Sheet config sync failed', e);
+    setSync('err','Saved locally; sheet sync failed');
+  }
+  render();
+}
+function copySetupLink(){
+  const params = new URLSearchParams();
+  if (CONFIG.sheetId)  params.set('sheet',  CONFIG.sheetId);
+  if (CONFIG.sheetTab && CONFIG.sheetTab !== 'Tracker') params.set('tab', CONFIG.sheetTab);
+  if (CONFIG.clientId) params.set('client', CONFIG.clientId);
+  if (!params.toString()){ alert('Nothing to share — Sheet ID and Client ID are empty.'); return; }
+  const url = location.origin + location.pathname + '#' + params.toString();
+  if (navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Setup link copied to clipboard.\n\nOpen this URL in another browser to auto-fill Sheet ID and Client ID; sign in once and the rest will sync from your Sheet.\n\nDo not share publicly — anyone with this link + access to your sheet can read it.');
+    });
+  } else {
+    prompt('Copy this URL and open it in another browser:', url);
+  }
 }
 function handleResetSettings(){
   if (!confirm('Reset all settings to the file defaults?\nYour overrides on this device will be cleared.')) return;
@@ -1314,8 +1425,29 @@ function handleResetSettings(){
   location.reload();
 }
 
+// On page load, accept a URL hash like #sheet=...&client=...&tab=... and persist
+// it as the local config. This is the "open this link in another browser to
+// auto-fill your IDs" path. We strip the hash from the URL after consuming so
+// the credentials don't linger in browser history.
+function applyHashConfig(){
+  if (!location.hash || location.hash.length < 2) return false;
+  const params = new URLSearchParams(location.hash.slice(1));
+  const map = {sheet:'sheetId', tab:'sheetTab', client:'clientId', start:'startDate', target:'targetPct', country:'country'};
+  const updates = {};
+  for (const [k, v] of params){
+    const cfgKey = map[k];
+    if (!cfgKey || !v) continue;
+    updates[cfgKey] = (cfgKey === 'targetPct') ? parseInt(v, 10) : v;
+  }
+  if (!Object.keys(updates).length) return false;
+  saveConfigToStorage(updates);
+  history.replaceState(null, '', location.pathname + location.search);
+  return true;
+}
+
 // =========== INIT ===========
 loadConfigFromStorage(); // pull localStorage overrides; calls applyConfig() internally
+applyHashConfig();        // if a #sheet=...&client=... hash is present, persist it
 const _t = today();
 g('fDate').value = key(_t.y, _t.m, _t.d);
 g('btnPrev').addEventListener('click', prevMonth);
@@ -1337,6 +1469,8 @@ g('btnSettings').addEventListener('click', openSettings);
 g('settingsClose').addEventListener('click', closeSettings);
 g('cfgCancel').addEventListener('click', closeSettings);
 g('cfgSave').addEventListener('click', handleSaveSettings);
+g('cfgSwitchAccount').addEventListener('click', () => { closeSettings(); switchAccount(); });
+g('cfgCopyLink').addEventListener('click', copySetupLink);
 g('cfgReset').addEventListener('click', handleResetSettings);
 g('settingsOverlay').addEventListener('click', e => { if (e.target === g('settingsOverlay')) closeSettings(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && g('settingsOverlay').classList.contains('show')) closeSettings(); });
