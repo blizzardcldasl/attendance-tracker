@@ -1014,13 +1014,18 @@ function signIn(){
   google.accounts.oauth2.initTokenClient({
     client_id: CONFIG.clientId, scope: SCOPE,
     callback: r => {
-      if (r.error){ setSync('err','Sign in failed'); console.error('OAuth error', r); return; }
+      if (r.error){
+        const desc = r.error_description || r.error || 'Sign in failed';
+        setSync('err', desc.length > 40 ? 'Sign in failed' : desc);
+        console.error('OAuth error:', r);
+        return;
+      }
       token = r.access_token; hideBanner(); loadSheet();
     }
-  // Force the account picker every time. Google's default auto-picks the
-  // most recently used session, making it impossible to switch between
-  // multiple Google accounts on one device.
-  }).requestAccessToken({prompt: 'select_account consent'});
+  // 'select_account' alone gives the picker. Combining with 'consent' as
+  // a space-delimited list returns HTTP 400 from Google's auth endpoint
+  // even though the OAuth 2.0 spec documents that combination as valid.
+  }).requestAccessToken({prompt: 'select_account'});
 }
 // Settings-panel "Switch account" entry point.
 function switchAccount(){ token = null; signIn(); }
