@@ -516,6 +516,17 @@ function clearConfigOverrides(){
   applyConfig();
 }
 function applyConfig(){
+  // Defensively scrub corrupted clientId/sheetId on every load. If the user
+  // pasted a markdown link or a full Sheets URL into Settings at any point,
+  // this auto-extracts the canonical ID so they don't have to manually fix it.
+  if (typeof sanitizeClientId === 'function'){
+    const cleanCid = sanitizeClientId(CONFIG.clientId);
+    if (cleanCid !== CONFIG.clientId){ CONFIG.clientId = cleanCid; }
+  }
+  if (typeof sanitizeSheetId === 'function'){
+    const cleanSid = sanitizeSheetId(CONFIG.sheetId);
+    if (cleanSid !== CONFIG.sheetId){ CONFIG.sheetId = cleanSid; }
+  }
   const parts = (CONFIG.startDate || '2026-04-13').split('-').map(Number);
   if (parts.length === 3 && parts.every(n => Number.isFinite(n))){
     START = {y: parts[0], m: parts[1] - 1, d: parts[2]};
@@ -986,7 +997,35 @@ async function saveConfigToSheet(){
 
 // Build stamp — bump when shipping fixes so the deployed page can be verified.
 // Visible at the bottom of the Settings panel and logged to console on load.
-const APP_BUILD = '2026-04-29-f';
+const APP_BUILD = '2026-04-29-g';
+
+// Sanitize values pasted into Settings. Users sometimes paste:
+//   - markdown link syntax: [client-id](http://client-id)
+//   - a full Google Sheets URL instead of just the ID
+//   - extra http:// prefixes / trailing slashes / whitespace
+// These regex extracts grab the canonical form out of any junk surrounding
+// it. Run on save AND on load so corrupted values in localStorage get
+// auto-cleaned on next page load (no need to manually edit / wipe).
+function sanitizeClientId(raw){
+  if (!raw) return '';
+  const v = String(raw).trim();
+  // Canonical OAuth Client ID: <digits>-<alphanumeric>.apps.googleusercontent.com
+  const m = v.match(/\d+-[a-z0-9]+\.apps\.googleusercontent\.com/i);
+  return m ? m[0] : v.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+}
+function sanitizeSheetId(raw){
+  if (!raw) return '';
+  const v = String(raw).trim();
+  // Full sheet URL? Extract the ID between /spreadsheets/d/ and the next /
+  const urlMatch = v.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (urlMatch) return urlMatch[1];
+  // Markdown link wrapping a sheet URL: [...](https://docs.google.com/spreadsheets/d/ID/...)
+  const mdMatch = v.match(/\(https?:\/\/[^)]*\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (mdMatch) return mdMatch[1];
+  // Bare ID with possible junk around it — keep only Sheets-ID-legal chars
+  const bareMatch = v.match(/[a-zA-Z0-9_-]{20,}/);
+  return bareMatch ? bareMatch[0] : v.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+}
 
 // =========== AUTH ===========
 function initAuth(){
@@ -1021,6 +1060,10 @@ function signIn(forceSwitch){
     setSync('err', 'Google library not loaded');
     return;
   }
+  // Diagnostic: log exactly what we're sending to GIS, so a typo / pasted
+  // markdown / truncation in localStorage is immediately visible in console.
+  console.log('[OAuth] client_id:', CONFIG.clientId);
+  console.log('[OAuth] sheet_id:', CONFIG.sheetId);
   try {
     const tc = google.accounts.oauth2.initTokenClient({
       client_id: CONFIG.clientId,
@@ -1412,9 +1455,9 @@ function openSettings(){
 }
 function closeSettings(){ g('settingsOverlay').classList.remove('show'); }
 async function handleSaveSettings(){
-  const sheetId        = g('cfgSheetId').value.trim();
+  const sheetId        = sanitizeSheetId(g('cfgSheetId').value);
   const sheetTab       = g('cfgSheetTab').value.trim() || 'Tracker';
-  const clientId       = g('cfgClientId').value.trim();
+  const clientId       = sanitizeClientId(g('cfgClientId').value);
   const startDate      = g('cfgStartDate').value.trim();
   const targetPct      = parseInt(g('cfgTarget').value, 10);
   const country        = (g('cfgCountry').value || 'US').toUpperCase();
