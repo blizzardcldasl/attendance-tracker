@@ -942,26 +942,40 @@ async function clearRow(row){
 // can't read the sheet without them).
 const CONFIG_TAB = '_Config';
 
+// Cache so we only probe the spreadsheet metadata once per session. Set to
+// true after we either confirm the tab exists or create it; reset on reload.
+let _configTabReady = false;
+
+// Probe via spreadsheets.get(fields=sheets.properties.title) — this returns
+// the list of tab titles in one call WITHOUT 400ing on missing tabs.
+// If _Config isn't in the list, create it via batchUpdate addSheet.
 async function ensureConfigSheet(){
+  if (_configTabReady) return true;
   try {
-    await shReq('GET', `/values/${enc(CONFIG_TAB + '!A1')}?valueRenderOption=UNFORMATTED_VALUE`);
+    const meta = await shReq('GET', '?fields=sheets.properties.title');
+    const tabs = (meta?.sheets || []).map(s => s.properties?.title || '');
+    if (tabs.includes(CONFIG_TAB)){
+      _configTabReady = true;
+      return true;
+    }
+    await shReq('POST', ':batchUpdate', {
+      requests: [{addSheet: {properties: {title: CONFIG_TAB, hidden: true}}}]
+    });
+    await shReq('PUT',
+      `/values/${enc(CONFIG_TAB + '!A1')}?valueInputOption=RAW`,
+      {values: [['Tracker config — managed by the app, do not edit.']]});
+    _configTabReady = true;
     return true;
   } catch (e){
-    try {
-      await shReq('POST', ':batchUpdate', {
-        requests: [{addSheet: {properties: {title: CONFIG_TAB, hidden: true}}}]
-      });
-      await shReq('PUT',
-        `/values/${enc(CONFIG_TAB + '!A1')}?valueInputOption=RAW`,
-        {values: [['Tracker config — managed by the app, do not edit.']]});
-      return true;
-    } catch (e2){
-      console.error('Could not create _Config sheet', e2);
-      return false;
-    }
+    console.error('[_Config] ensure failed', e);
+    return false;
   }
 }
 async function loadConfigFromSheet(){
+  // Skip remote read entirely if the tab doesn't exist — cheaper than letting
+  // a 400 land in the console. ensureConfigSheet uses metadata, no 400s.
+  const ready = await ensureConfigSheet();
+  if (!ready) return false;
   try {
     const r = await shReq('GET',
       `/values/${enc(CONFIG_TAB + '!A2')}?valueRenderOption=UNFORMATTED_VALUE`);
@@ -976,13 +990,14 @@ async function loadConfigFromSheet(){
     if (Object.keys(updates).length){ saveConfigToStorage(updates); }
     return true;
   } catch (e){
+    console.warn('[_Config] read failed', e);
     return false;
   }
 }
 async function saveConfigToSheet(){
   if (!token) return false;
-  const ok = await ensureConfigSheet();
-  if (!ok) return false;
+  const ready = await ensureConfigSheet();
+  if (!ready) return false;
   const payload = {
     startDate:      CONFIG.startDate,
     targetPct:      CONFIG.targetPct,
@@ -997,7 +1012,7 @@ async function saveConfigToSheet(){
 
 // Build stamp — bump when shipping fixes so the deployed page can be verified.
 // Visible at the bottom of the Settings panel and logged to console on load.
-const APP_BUILD = '2026-04-29-g';
+const APP_BUILD = '2026-04-29-h';
 
 // Sanitize values pasted into Settings. Users sometimes paste:
 //   - markdown link syntax: [client-id](http://client-id)
