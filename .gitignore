@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+._*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local artifacts
+*.zip
+node_modules/
+
+# Personal config copies (in case anyone keeps a local override file)
+*.local.html
+config.local.json
