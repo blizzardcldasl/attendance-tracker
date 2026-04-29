@@ -467,6 +467,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
         <button class="btn-bulk" id="cfgSave" type="button">Save &amp; reload</button>
       </div>
     </div>
+    <div style="padding:8px 22px 12px;text-align:right;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--muted);background:#FAF8F4;border-radius:0 0 14px 14px;">build <span id="buildStamp">&mdash;</span></div>
   </div>
 </div>
 
@@ -983,6 +984,10 @@ async function saveConfigToSheet(){
   return true;
 }
 
+// Build stamp — bump when shipping fixes so the deployed page can be verified.
+// Visible at the bottom of the Settings panel and logged to console on load.
+const APP_BUILD = '2026-04-29-d';
+
 // =========== AUTH ===========
 function initAuth(){
   render(); // paint empty calendar before sign-in
@@ -1010,25 +1015,54 @@ function showSignIn(){
   showBanner('<strong>Sign in to sync with Google Sheets.</strong> <button id="bSignIn">Sign In</button>');
   g('bSignIn').onclick = signIn;
 }
-function signIn(){
-  google.accounts.oauth2.initTokenClient({
-    client_id: CONFIG.clientId, scope: SCOPE,
-    callback: r => {
-      if (r.error){
-        const desc = r.error_description || r.error || 'Sign in failed';
-        setSync('err', desc.length > 40 ? 'Sign in failed' : desc);
-        console.error('OAuth error:', r);
-        return;
+function signIn(forceSwitch){
+  if (!CONFIG.clientId){ setSync('err', 'No Client ID set'); return; }
+  if (typeof google === 'undefined' || !google.accounts?.oauth2){
+    setSync('err', 'Google library not loaded');
+    return;
+  }
+  try {
+    const tc = google.accounts.oauth2.initTokenClient({
+      client_id: CONFIG.clientId,
+      scope: SCOPE,
+      callback: r => {
+        if (r.error){
+          const desc = r.error_description || r.error || 'Sign in failed';
+          setSync('err', desc.length > 40 ? 'Sign in failed' : desc);
+          console.error('[OAuth callback]', r);
+          return;
+        }
+        token = r.access_token; hideBanner(); loadSheet();
       }
-      token = r.access_token; hideBanner(); loadSheet();
+    });
+    // For "Switch account": pass select_account to force the picker.
+    // For initial sign-in: use defaults (which give picker on first visit
+    // and silent re-auth on subsequent visits per GIS spec).
+    if (forceSwitch){
+      tc.requestAccessToken({prompt: 'select_account'});
+    } else {
+      tc.requestAccessToken();
     }
-  // 'select_account' alone gives the picker. Combining with 'consent' as
-  // a space-delimited list returns HTTP 400 from Google's auth endpoint
-  // even though the OAuth 2.0 spec documents that combination as valid.
-  }).requestAccessToken({prompt: 'select_account'});
+  } catch (e){
+    console.error('[OAuth init]', e);
+    setSync('err', 'Init failed: ' + (e.message || 'unknown'));
+  }
 }
-// Settings-panel "Switch account" entry point.
-function switchAccount(){ token = null; signIn(); }
+// Switch-account flow: revoke the existing token so Google can't silently
+// re-grant the same identity, then re-auth with prompt:'select_account'.
+async function switchAccount(){
+  if (token){
+    try {
+      await fetch('https://oauth2.googleapis.com/revoke?token=' + encodeURIComponent(token),
+        {method: 'POST'});
+      console.log('[OAuth] revoked previous token');
+    } catch (e){
+      console.warn('[OAuth] revoke failed (non-fatal):', e);
+    }
+  }
+  token = null;
+  signIn(true);
+}
 
 // =========== ACTIONS (optimistic) ===========
 // Mutate `entries[k]` first, render, then sync. On failure: revert + render + flag error.
@@ -1451,6 +1485,8 @@ function applyHashConfig(){
 }
 
 // =========== INIT ===========
+console.log('%c[Attendance Tracker] build ' + APP_BUILD, 'color:#0D7A5C;font-weight:600');
+const _bs = document.getElementById('buildStamp'); if (_bs) _bs.textContent = APP_BUILD;
 loadConfigFromStorage(); // pull localStorage overrides; calls applyConfig() internally
 applyHashConfig();        // if a #sheet=...&client=... hash is present, persist it
 const _t = today();
