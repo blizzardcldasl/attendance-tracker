@@ -371,6 +371,19 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
           <small>Default 60. Lower or raise to match your team's hybrid policy.</small>
         </div>
       </div>
+      <div class="ss-group">
+        <h4>Holidays</h4>
+        <div class="ff">
+          <label for="cfgCountry">Country preset</label>
+          <select id="cfgCountry"></select>
+          <small>Federal/national holidays auto-computed for any year.</small>
+        </div>
+        <div class="ff">
+          <label for="cfgCustom">Custom holidays</label>
+          <textarea id="cfgCustom" rows="5" placeholder="2026-12-31  Year-end closure&#10;2026-07-02  Day before Independence Day&#10;# lines starting with # are comments" style="width:100%;padding:10px 11px;background:#FAF8F4;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--text);outline:none;resize:vertical;min-height:90px;"></textarea>
+          <small>One per line: <code>YYYY-MM-DD &lt;optional name&gt;</code>. Adds to the country preset above.</small>
+        </div>
+      </div>
     </div>
     <div class="settings-foot">
       <button class="btn-bulk ghost" id="cfgReset" type="button">Reset to defaults</button>
@@ -395,7 +408,12 @@ const CONFIG_KEY  = 'attendance-tracker-config';
 // Tweak these baked defaults for your fork. They can also be overridden
 // at runtime via the Settings panel (gear icon), with overrides persisted
 // to localStorage on the user's device.
-const DEFAULT_CONFIG = { startDate: '2026-01-01', targetPct: 60 };
+const DEFAULT_CONFIG = {
+  startDate: '2026-01-01',
+  targetPct: 60,
+  country:   'US',
+  customHolidays: ''
+};
 let CONFIG = {...DEFAULT_CONFIG};
 let START = {y: 2026, m: 3, d: 13};
 
@@ -423,6 +441,9 @@ function applyConfig(){
   }
   const tp = Number(CONFIG.targetPct);
   CONFIG.targetPct = (isFinite(tp) && tp >= 1 && tp <= 100) ? Math.round(tp) : 60;
+  if (typeof CONFIG.country !== 'string' || !CONFIG.country) CONFIG.country = 'US';
+  CONFIG.country = CONFIG.country.toUpperCase();
+  if (typeof _invalidateHolidayCache === 'function') _invalidateHolidayCache();
   const sp = document.getElementById('startPill');
   if (sp && typeof MONTHS !== 'undefined'){
     const yy = String(START.y).slice(-2);
@@ -436,33 +457,184 @@ function applyConfig(){
   if (tgt) tgt.style.left = CONFIG.targetPct + '%';
 }
 
-// Default holiday set: US federal holidays for 2026/2027 plus the common
-// "day after Thanksgiving" closure. Edit this object and HOL_NAMES below
-// to match your company's calendar.
-const HOLIDAYS = new Set([
-  '2026-01-01','2026-01-19','2026-02-16','2026-05-25','2026-06-19',
-  '2026-07-03','2026-09-07','2026-10-12','2026-11-11','2026-11-26',
-  '2026-11-27','2026-12-25',
-  '2027-01-01','2027-01-18','2027-02-15','2027-05-31','2027-06-18',
-  '2027-07-05','2027-09-06','2027-10-11','2027-11-11','2027-11-25',
-  '2027-11-26','2027-12-24'
-]);
-const HOL_NAMES = {
-  '2026-01-01':"New Year's Day",'2026-01-19':'MLK Day',
-  '2026-02-16':"Presidents' Day",'2026-05-25':'Memorial Day',
-  '2026-06-19':'Juneteenth','2026-07-03':'Independence Day (obs.)',
-  '2026-09-07':'Labor Day','2026-10-12':'Columbus Day',
-  '2026-11-11':'Veterans Day','2026-11-26':'Thanksgiving',
-  '2026-11-27':'Day After Thanksgiving','2026-12-25':'Christmas',
-  '2027-01-01':"New Year's Day",'2027-01-18':'MLK Day',
-  '2027-02-15':"Presidents' Day",'2027-05-31':'Memorial Day',
-  '2027-06-18':'Juneteenth (obs.)','2027-07-05':'Independence Day (obs.)',
-  '2027-09-06':'Labor Day','2027-10-11':'Columbus Day',
-  '2027-11-11':'Veterans Day','2027-11-25':'Thanksgiving',
-  '2027-11-26':'Day After Thanksgiving','2027-12-24':'Christmas (obs.)'
-};
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// =========== HOLIDAY ENGINE ===========
+// Compute holidays algorithmically per country. New Set covers all years; no
+// yearly maintenance. Company-specific days go in the Settings panel's
+// "Custom holidays" textarea.
+
+const COUNTRIES = [
+  {code:'US', label:'United States (federal)'},
+  {code:'UK', label:'United Kingdom (England & Wales)'},
+  {code:'CA', label:'Canada (federal)'},
+  {code:'AU', label:'Australia (national)'},
+  {code:'DE', label:'Germany (federal)'},
+  {code:'FR', label:'France'},
+  {code:'NONE', label:'None — custom only'},
+];
+
+function _ymd(y,m,d){ return `${y}-${pad2(m)}-${pad2(d)}`; }
+function easterSunday(y){
+  const a=y%19, b=Math.floor(y/100), c=y%100, d=Math.floor(b/4), e=b%4;
+  const f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4;
+  const L=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*L)/451);
+  const month=Math.floor((h+L-7*m+114)/31);
+  const day=((h+L-7*m+114)%31)+1;
+  return {month, day};
+}
+function _shiftDays(y,m,d,offset){ const dt=new Date(y, m-1, d+offset); return _ymd(dt.getFullYear(), dt.getMonth()+1, dt.getDate()); }
+function _easterKey(y, offset){ const e=easterSunday(y); return _shiftDays(y, e.month, e.day, offset); }
+function _nthWeekday(y, m, weekday, n){
+  const first=new Date(y, m-1, 1).getDay();
+  return _ymd(y, m, 1 + ((weekday - first + 7) % 7) + (n - 1) * 7);
+}
+function _lastWeekday(y, m, weekday){
+  const lastDay=new Date(y, m, 0).getDate();
+  const lastDow=new Date(y, m-1, lastDay).getDay();
+  return _ymd(y, m, lastDay - ((lastDow - weekday + 7) % 7));
+}
+function _fixed(y, m, d, name, mode){
+  const dt=new Date(y, m-1, d), dow=dt.getDay();
+  let shift=0;
+  if (mode === 'nearest'){ if (dow===6) shift=-1; else if (dow===0) shift=1; }
+  else if (mode === 'forward'){ if (dow===6) shift=2; else if (dow===0) shift=1; }
+  if (shift === 0) return {key: _ymd(y, m, d), name};
+  const f=new Date(y, m-1, d+shift);
+  return {key: _ymd(f.getFullYear(), f.getMonth()+1, f.getDate()), name: name + ' (obs.)'};
+}
+function _ukChristmasPair(y){
+  const out=[];
+  const c25=new Date(y, 11, 25), b26=new Date(y, 11, 26);
+  let cKey, bKey;
+  if (c25.getDay() === 6){ cKey = _ymd(y, 12, 28); }
+  else if (c25.getDay() === 0){ cKey = _ymd(y, 12, 27); }
+  else { cKey = _ymd(y, 12, 25); }
+  if (b26.getDay() === 6){ bKey = _ymd(y, 12, 28); }
+  else if (b26.getDay() === 0){ bKey = _ymd(y, 12, 27); }
+  else { bKey = _ymd(y, 12, 26); }
+  if (cKey === bKey){ const m=parseKey(bKey); bKey = _ymd(m.y, m.m+1, m.d+1); }
+  out.push({key: cKey, name: cKey === _ymd(y,12,25) ? 'Christmas Day' : 'Christmas Day (subst.)'});
+  out.push({key: bKey, name: bKey === _ymd(y,12,26) ? 'Boxing Day' : 'Boxing Day (subst.)'});
+  return out;
+}
+
+const COUNTRY_RULES = {
+  US: y => [
+    _fixed(y, 1, 1, "New Year's Day", 'nearest'),
+    {key: _nthWeekday(y, 1, 1, 3), name: 'MLK Day'},
+    {key: _nthWeekday(y, 2, 1, 3), name: "Presidents' Day"},
+    {key: _lastWeekday(y, 5, 1), name: 'Memorial Day'},
+    _fixed(y, 6, 19, 'Juneteenth', 'nearest'),
+    _fixed(y, 7, 4, 'Independence Day', 'nearest'),
+    {key: _nthWeekday(y, 9, 1, 1), name: 'Labor Day'},
+    {key: _nthWeekday(y, 10, 1, 2), name: 'Columbus Day'},
+    _fixed(y, 11, 11, 'Veterans Day', 'nearest'),
+    {key: _nthWeekday(y, 11, 4, 4), name: 'Thanksgiving'},
+    {key: _shiftDays(y, 11, parseKey(_nthWeekday(y, 11, 4, 4)).d, 1), name: 'Day After Thanksgiving'},
+    _fixed(y, 12, 25, 'Christmas', 'nearest'),
+  ],
+  UK: y => [
+    _fixed(y, 1, 1, "New Year's Day", 'forward'),
+    {key: _easterKey(y, -2), name: 'Good Friday'},
+    {key: _easterKey(y, 1), name: 'Easter Monday'},
+    {key: _nthWeekday(y, 5, 1, 1), name: 'Early May Bank Holiday'},
+    {key: _lastWeekday(y, 5, 1), name: 'Spring Bank Holiday'},
+    {key: _lastWeekday(y, 8, 1), name: 'Summer Bank Holiday'},
+    ..._ukChristmasPair(y),
+  ],
+  CA: y => [
+    _fixed(y, 1, 1, "New Year's Day", 'forward'),
+    {key: _easterKey(y, -2), name: 'Good Friday'},
+    (() => { const md=new Date(y, 4, 24); const back=(md.getDay()+6)%7; return {key: _ymd(y, 5, 24-back), name: 'Victoria Day'}; })(),
+    _fixed(y, 7, 1, 'Canada Day', 'forward'),
+    {key: _nthWeekday(y, 9, 1, 1), name: 'Labour Day'},
+    {key: _nthWeekday(y, 10, 1, 2), name: 'Thanksgiving'},
+    _fixed(y, 11, 11, 'Remembrance Day', 'forward'),
+    _fixed(y, 12, 25, 'Christmas', 'forward'),
+    _fixed(y, 12, 26, 'Boxing Day', 'forward'),
+  ],
+  AU: y => [
+    _fixed(y, 1, 1, "New Year's Day", 'forward'),
+    _fixed(y, 1, 26, 'Australia Day', 'forward'),
+    {key: _easterKey(y, -2), name: 'Good Friday'},
+    {key: _easterKey(y, 1), name: 'Easter Monday'},
+    _fixed(y, 4, 25, 'Anzac Day', 'none'),
+    _fixed(y, 12, 25, 'Christmas', 'forward'),
+    _fixed(y, 12, 26, 'Boxing Day', 'forward'),
+  ],
+  DE: y => [
+    _fixed(y, 1, 1, 'Neujahr', 'none'),
+    {key: _easterKey(y, -2), name: 'Karfreitag'},
+    {key: _easterKey(y, 1), name: 'Ostermontag'},
+    _fixed(y, 5, 1, 'Tag der Arbeit', 'none'),
+    {key: _easterKey(y, 39), name: 'Christi Himmelfahrt'},
+    {key: _easterKey(y, 50), name: 'Pfingstmontag'},
+    _fixed(y, 10, 3, 'Tag der Deutschen Einheit', 'none'),
+    _fixed(y, 12, 25, '1. Weihnachtstag', 'none'),
+    _fixed(y, 12, 26, '2. Weihnachtstag', 'none'),
+  ],
+  FR: y => [
+    _fixed(y, 1, 1, "Jour de l'an", 'none'),
+    {key: _easterKey(y, 1), name: 'Lundi de Pâques'},
+    _fixed(y, 5, 1, 'Fête du Travail', 'none'),
+    _fixed(y, 5, 8, 'Victoire 1945', 'none'),
+    {key: _easterKey(y, 39), name: 'Ascension'},
+    {key: _easterKey(y, 50), name: 'Lundi de Pentecôte'},
+    _fixed(y, 7, 14, 'Fête nationale', 'none'),
+    _fixed(y, 8, 15, 'Assomption', 'none'),
+    _fixed(y, 11, 1, 'Toussaint', 'none'),
+    _fixed(y, 11, 11, 'Armistice', 'none'),
+    _fixed(y, 12, 25, 'Noël', 'none'),
+  ],
+  NONE: () => [],
+};
+
+const _holCache = new Map();
+function _holidaysFor(year){
+  const country=(CONFIG.country || 'US').toUpperCase();
+  const ck=country + '-' + year;
+  if (_holCache.has(ck)) return _holCache.get(ck);
+  const fn=COUNTRY_RULES[country] || COUNTRY_RULES.US;
+  const map={};
+  const yearPrefix=String(year) + '-';
+  for (const yr of [year, year + 1]){
+    for (const {key, name} of fn(yr)){
+      if (key && key.startsWith(yearPrefix)) map[key] = name;
+    }
+  }
+  _holCache.set(ck, map);
+  return map;
+}
+function _invalidateHolidayCache(){ _holCache.clear(); _customHolidaysCache = null; }
+
+let _customHolidaysCache = null;
+function _customHolidaysMap(){
+  if (_customHolidaysCache) return _customHolidaysCache;
+  const out={};
+  const text=CONFIG.customHolidays || '';
+  for (const raw of text.split('\n')){
+    const line=raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const m=line.match(/^(\d{4}-\d{2}-\d{2})\s*(?:[-—:/\\]+|\/\/)?\s*(.*)$/);
+    if (m){ out[m[1]] = (m[2] || 'Custom Holiday').trim(); }
+  }
+  _customHolidaysCache = out;
+  return out;
+}
+
+function holidayName(dateKey){
+  if (!dateKey || dateKey.length < 4) return null;
+  const year=+dateKey.slice(0, 4);
+  if (!Number.isFinite(year)) return null;
+  const builtin=_holidaysFor(year);
+  if (builtin[dateKey]) return builtin[dateKey];
+  const custom=_customHolidaysMap();
+  if (custom[dateKey]) return custom[dateKey];
+  return null;
+}
 
 const _now = new Date();
 const CAL_END_Y = _now.getFullYear() + 2;
@@ -480,7 +652,7 @@ const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return {y, m:m
 const today = () => { const n = new Date(); return {y:n.getFullYear(), m:n.getMonth(), d:n.getDate()}; };
 const isWknd = (y,m,d) => { const w = new Date(y,m,d).getDay(); return w === 0 || w === 6; };
 const isPre = (y,m,d) => y < START.y || (y === START.y && m < START.m) || (y === START.y && m === START.m && d < START.d);
-const isHol = k => HOLIDAYS.has(k);
+const isHol = k => holidayName(k) !== null;
 const isConf = t => !!t && t.startsWith('s-');
 const isPlan = t => !!t && t.startsWith('p-');
 const baseT  = t => t ? t.replace(/^[sp]-/, '') : null;
@@ -497,9 +669,21 @@ function normalizeDateCell(raw){
   if (typeof raw === 'number' && isFinite(raw)) return serialToYMD(raw);
   const s = String(raw).trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // ISO with time/zone — extract YMD literally to avoid Date()'s timezone shift
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  // US-style M/D/YYYY
+  const us = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (us) return `${us[3]}-${pad2(+us[1])}-${pad2(+us[2])}`;
   const d = new Date(s);
   if (!isNaN(d.getTime())) return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
   return null;
+}
+
+// Local-time timestamp for the Updated column in XLSX exports.
+function localTimestamp(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
 }
 function normalizeType(raw){
   if (!raw) return null;
@@ -627,7 +811,7 @@ function exportXlsx(){
     const {y, m, d} = parseKey(k);
     const dayName = DAYS[new Date(y,m,d).getDay()];
     const ent = entries[k];
-    rows.push([k, dayName, ent.type, ent.note || '', new Date().toISOString().slice(0,19).replace('T',' ')]);
+    rows.push([k, dayName, ent.type, ent.note || '', localTimestamp()]);
   }
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws['!cols'] = [{wch:12},{wch:6},{wch:10},{wch:30},{wch:20}];
@@ -760,7 +944,7 @@ function renderCal(t, y, m, stale){
       cell.title = ent ? `${type}${ent.note ? ' — ' + ent.note : ''} (click to cycle)` : 'Click to log this day';
       cell.onclick = () => quickCycle(k);
     } else if (hol){
-      cell.title = HOL_NAMES[k] || 'Company Holiday';
+      cell.title = holidayName(k) || 'Company Holiday';
     }
     grid.appendChild(cell);
   }
@@ -776,7 +960,7 @@ function renderLog(y, m){
   const holEnt = [];
   for (let d = 1; d <= dim; d++){
     const k = key(y, m, d);
-    if (isHol(k) && !entries[k]) holEnt.push([k, {type:'hol', note: HOL_NAMES[k] || 'Company Holiday', fixed: true}]);
+    if (isHol(k) && !entries[k]) holEnt.push([k, {type:'hol', note: holidayName(k) || 'Company Holiday', fixed: true}]);
   }
   const all = [...userEnt, ...holEnt].sort(([a],[b]) => b.localeCompare(a));
   const list = g('logList');
@@ -847,19 +1031,43 @@ function nextMonth(){
 }
 
 // =========== SETTINGS UI ===========
+function populateCountryDropdown(){
+  const sel = g('cfgCountry');
+  if (!sel || sel.children.length) return;
+  for (const c of COUNTRIES){
+    const o = document.createElement('option');
+    o.value = c.code; o.textContent = c.label;
+    sel.appendChild(o);
+  }
+}
 function openSettings(){
+  populateCountryDropdown();
   g('cfgStartDate').value = CONFIG.startDate || '';
   g('cfgTarget').value    = CONFIG.targetPct || 60;
+  g('cfgCountry').value   = (CONFIG.country || 'US').toUpperCase();
+  g('cfgCustom').value    = CONFIG.customHolidays || '';
   g('settingsOverlay').classList.add('show');
   setTimeout(() => g('cfgStartDate').focus(), 50);
 }
 function closeSettings(){ g('settingsOverlay').classList.remove('show'); }
 function handleSaveSettings(){
-  const startDate = g('cfgStartDate').value.trim();
-  const targetPct = parseInt(g('cfgTarget').value, 10);
+  const startDate      = g('cfgStartDate').value.trim();
+  const targetPct      = parseInt(g('cfgTarget').value, 10);
+  const country        = (g('cfgCountry').value || 'US').toUpperCase();
+  const customHolidays = g('cfgCustom').value || '';
   if (!startDate || !/^\d{4}-\d{2}-\d{2}$/.test(startDate)){ toast('Start date must be YYYY-MM-DD.', 'err'); return; }
   if (!isFinite(targetPct) || targetPct < 1 || targetPct > 100){ toast('Target % must be 1–100.', 'err'); return; }
-  saveConfigToStorage({startDate, targetPct});
+  if (!COUNTRY_RULES[country]){ toast('Unknown country.', 'err'); return; }
+  const badLines = [];
+  for (const raw of customHolidays.split('\n')){
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    if (!/^\d{4}-\d{2}-\d{2}\b/.test(line)) badLines.push(line);
+  }
+  if (badLines.length){
+    if (!confirm(`These custom-holiday lines don't start with YYYY-MM-DD and will be ignored:\n\n${badLines.slice(0,5).join('\n')}\n\nSave anyway?`)) return;
+  }
+  saveConfigToStorage({startDate, targetPct, country, customHolidays});
   closeSettings();
   render();
   toast('Settings saved ✓', 'ok');

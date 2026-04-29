@@ -20,7 +20,7 @@ Hybrid policies usually demand a percentage of office days per month, and most p
 - **Live compliance math** — Confirmed Rate, Projected Rate, Eligible Days, Still Needed; progress bar with a target marker.
 - **Smart form date** — picking a future date defaults the type to Planned; picking today/past defaults to Confirmed.
 - **Configurable from the UI** — gear icon opens a Settings panel for sheet ID, OAuth client ID, start date, target %. No source-editing required.
-- **Holiday-aware** — fixed company holidays are auto-excluded from compliance and shown in violet on the calendar. Default list ships with US federal holidays for 2026/2027.
+- **Holiday-aware, every year forever** — federal/national holidays are computed algorithmically (no static lookup table), so 2028, 2030, 2050 all work without code edits. Country presets ship for **US, UK, Canada, Australia, Germany, France**, plus a custom-holidays textarea for company-specific days (year-end closures, day-before-Independence-Day, etc.).
 - **Type taxonomy** — Office, Remote, PTO, Sick, Travel, Floating Holiday — with `s-`/`p-` prefix for confirmed/planned. PTO/Sick/Travel/Floating Holiday days are excluded from the eligible-days denominator.
 - **Pre-employment days** — anything before your start date is greyed out and not counted.
 - **Mobile responsive**, accessible (WCAG AA contrast, keyboard-navigable, focus rings), no external dependencies except Google Fonts and (cloud only) Google's auth library.
@@ -57,8 +57,19 @@ Everything user-facing is in the Settings panel (gear icon, top right):
 | OAuth Client ID | ✓ | — | — |
 | Start date | ✓ | ✓ | 2026-01-01 |
 | Target percentage | ✓ | ✓ | 60% |
+| Country preset | ✓ | ✓ | US |
+| Custom holidays | ✓ | ✓ | (empty) |
 
 Settings persist to `localStorage` per device.
+
+**Custom holidays** format — one per line in the textarea:
+```
+2026-12-31  Year-end closure
+2026-07-02  Day before Independence Day
+# lines starting with # are comments
+2027-01-02
+```
+The optional name after the date is shown in tooltips and the day log. Anything not matching `YYYY-MM-DD` at the start of the line is rejected with a confirmation prompt.
 
 If you'd rather bake your defaults into the file (so a fresh browser already has them filled in), edit the `DEFAULT_CONFIG` object near the top of the `<script>` block. Holiday list is in the same area — `HOLIDAYS` (the Set) and `HOL_NAMES` (display labels). Replace freely with your company's calendar.
 
@@ -88,7 +99,8 @@ Past planned days that you didn't promote count as **nothing** in Confirmed Rate
 ## Tech notes
 
 - Single HTML file. No build, no bundler, no transpiler. Open it in any modern browser.
-- Cloud version uses Google's GIS token client + Sheets v4 REST. Reads with `valueRenderOption=UNFORMATTED_VALUE` and converts serial dates back to `YYYY-MM-DD` so date round-trips are deterministic.
+- Cloud version uses Google's GIS token client + Sheets v4 REST. Reads with `valueRenderOption=UNFORMATTED_VALUE` and converts serial dates back to `YYYY-MM-DD` so date round-trips are deterministic and timezone-safe.
+- Holiday engine computes from rules per country (Easter via the Anonymous Gregorian algorithm; nth-weekday-of-month helpers; "observed" rules per country: nearest weekday for US, forward-only for UK/CA/AU, no shift for DE/FR). Cached per-year, invalidated when settings change.
 - Optimistic UI: every mutation updates state in memory and re-renders synchronously, *then* fires the network request. On failure, state reverts and the sync indicator turns red.
 - Local version uses `localStorage` for state and [SheetJS](https://cdn.jsdelivr.net/npm/xlsx@0.18.5) for `.xlsx` round-trip.
 - Fonts: [Inter](https://rsms.me/inter/) (UI) + [Fraunces](https://fonts.google.com/specimen/Fraunces) (display) via Google Fonts.

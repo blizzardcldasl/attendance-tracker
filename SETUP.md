@@ -110,17 +110,18 @@ The page reloads, attempts sign-in against your client ID, and starts syncing to
 
 If you'd rather edit the source baked-in defaults (e.g. for permanent multi-device deployment): open `index.html`, find `const DEFAULT_CONFIG = {…}` near the top of the `<script>` block, replace the values, save. Anyone using a fresh browser will get those defaults.
 
-### B.4 — Optional: change holidays
+### B.4 — Holidays are configured in the Settings panel
 
-Holidays aren't in the Settings panel. To customize, open `index.html` and edit the `HOLIDAYS` Set near the top of the script:
+The Settings panel includes a **Country preset** dropdown (US, UK, Canada, Australia, Germany, France, or None) and a **Custom holidays** textarea for company-specific days. Federal/national holidays are computed for any year — no need to update yearly.
 
-```js
-const HOLIDAYS = new Set([
-  '2026-01-01','2026-01-19', ...
-]);
+Custom holidays format, one per line:
+```
+2026-12-31  Year-end closure
+2026-07-02  Day before Independence Day
+# lines starting with # are comments
 ```
 
-Add or remove `YYYY-MM-DD` strings. The 2027 holidays are estimated — confirm closer to the date and update as needed.
+The optional name after each date appears in tooltips and the Day Log. To customize the country presets themselves (e.g. different observance rules), edit `COUNTRY_RULES` in the script.
 
 ### B.5 — Pick your host
 
