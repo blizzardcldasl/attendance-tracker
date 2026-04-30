@@ -39,7 +39,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .brand h1{font-family:'Fraunces',serif;font-weight:900;font-size:34px;line-height:.95;letter-spacing:-1px;color:var(--text);font-variation-settings:"opsz" 96;}
 .brand h1 em{font-style:italic;color:var(--teal-dk);font-weight:500;font-variation-settings:"opsz" 144;}
 .hdr-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.btn-io{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;box-shadow:var(--sh-1);transition:all .15s;letter-spacing:.2px;text-transform:uppercase;letter-spacing:.6px;}
+.btn-io{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;box-shadow:var(--sh-1);transition:all .15s;letter-spacing:.6px;text-transform:uppercase;}
 .btn-io:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-1px);}
 .start-pill{font-size:11px;font-weight:700;color:var(--teal-dk);background:var(--teal-tint);border:1px solid rgba(13,122,92,.25);border-radius:999px;padding:6px 12px;letter-spacing:.4px;text-transform:uppercase;}
 .mode-pill{font-size:10px;font-weight:700;color:var(--travel);background:var(--travel-bg);border:1px solid rgba(30,64,175,.2);border-radius:999px;padding:5px 11px;letter-spacing:1px;text-transform:uppercase;}
@@ -49,7 +49,6 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .toast.err{background:var(--rose);}
 .toast.ok{background:var(--teal-dk);}
 
-/* STALE PLANNED BANNER */
 .stale-banner{display:none;align-items:center;gap:14px;justify-content:space-between;background:linear-gradient(180deg,#FFFBEB,#FEF3C7);border:1.5px solid var(--amber);border-radius:var(--r);padding:13px 18px;margin-bottom:18px;flex-wrap:wrap;}
 .stale-banner.show{display:flex;}
 .stale-banner .sb-l{display:flex;align-items:center;gap:11px;}
@@ -91,7 +90,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .prog-track{position:relative;background:#EFECE5;border-radius:8px;height:11px;overflow:hidden;margin-bottom:6px;}
 .bar-proj{position:absolute;top:0;left:0;height:100%;background:#BAE6FD;border-radius:8px;transition:width .45s cubic-bezier(.4,0,.2,1);}
 .bar-conf{position:absolute;top:0;left:0;height:100%;border-radius:8px;transition:width .45s cubic-bezier(.4,0,.2,1),background .25s;}
-.prog-tgt{position:absolute;top:-3px;bottom:-3px;left:60%;width:2px;background:var(--amber);z-index:2;}
+.prog-tgt{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--amber);z-index:2;}
 .prog-tgt::after{content:"";position:absolute;top:-4px;left:-3px;width:8px;height:8px;background:var(--amber);transform:rotate(45deg);}
 .prog-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted2);font-weight:600;margin-bottom:10px;letter-spacing:.4px;}
 .prog-labels span:nth-child(2){color:var(--amber);font-weight:700;}
@@ -153,6 +152,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .btn-log::before{content:"+";font-size:14px;font-weight:700;}
 .form-hint{font-size:11.5px;color:var(--muted2);margin-top:12px;line-height:1.65;border-top:1px solid var(--hairline);padding-top:11px;}
 .form-hint strong{color:var(--text2);font-weight:700;}
+.form-hint .build-stamp{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--muted);display:block;margin-top:8px;}
 
 .log-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-1);}
 .log-card .card-h{padding:14px 18px 12px;border-bottom:1px solid var(--hairline);margin-bottom:0;}
@@ -176,35 +176,13 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .pk-fhol,.pk-hol{background:var(--hol-bg);color:var(--hol);}
 .pk-plan{background:#F2EFE9;color:var(--muted2);border:1px dashed var(--border2);padding:1.5px 7px;}
 .pk-conf{background:var(--teal-lt);color:var(--teal-dk);}
-.ln{color:var(--muted2);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;font-size:11px;}
+.ln{color:var(--muted2);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;font-size:11px;}
 .la{display:flex;gap:4px;align-items:center;margin-left:auto;flex-shrink:0;}
 .btn-cnf{padding:4px 9px;font-size:9.5px;font-weight:700;background:var(--teal-lt);color:var(--teal-dk);border:1px solid rgba(13,122,92,.3);border-radius:5px;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;transition:all .15s;}
 .btn-cnf:hover{background:var(--teal);color:#fff;border-color:var(--teal-dk);}
 .btn-x{width:24px;height:24px;color:var(--muted);border-radius:5px;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .btn-x:hover{background:var(--sick-bg);color:var(--sick);}
 .no-log{padding:28px 16px;text-align:center;color:var(--muted2);font-size:12.5px;font-style:italic;}
-
-/* SETTINGS */
-.btn-gear{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--surface);border:1px solid var(--border);border-radius:50%;font-size:14px;color:var(--text2);box-shadow:var(--sh-1);transition:all .15s;}
-.btn-gear:hover{border-color:var(--teal);color:var(--teal);transform:rotate(45deg);}
-.settings-overlay{position:fixed;inset:0;background:rgba(28,25,23,.42);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
-.settings-overlay.show{display:flex;}
-.settings-panel{background:var(--surface);border-radius:14px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px -12px rgba(0,0,0,.32),0 8px 24px -4px rgba(0,0,0,.18);border:1px solid var(--border);}
-.settings-h{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--hairline);}
-.settings-h h3{font-family:'Fraunces',serif;font-weight:700;font-size:20px;letter-spacing:-.4px;font-variation-settings:"opsz" 96;}
-.settings-close{width:30px;height:30px;border-radius:50%;font-size:14px;color:var(--muted);transition:all .15s;background:none;border:none;cursor:pointer;}
-.settings-close:hover{background:var(--bg);color:var(--text);}
-.settings-body{padding:18px 22px 6px;}
-.ss-group{margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--hairline);}
-.ss-group:last-child{border-bottom:none;}
-.ss-group h4{font-size:9.5px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted2);margin-bottom:13px;display:flex;align-items:center;gap:7px;}
-.ss-group h4::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--teal);}
-.ss-group .ff small{display:block;color:var(--muted2);font-size:11px;margin-top:5px;line-height:1.5;}
-.settings-foot{display:flex;justify-content:space-between;gap:10px;padding:14px 22px;border-top:1px solid var(--hairline);background:#FAF8F4;border-radius:0 0 14px 14px;flex-wrap:wrap;}
-.settings-foot .right{display:flex;gap:8px;}
-.cfg-row-target{display:flex;gap:6px;align-items:center;}
-.cfg-row-target input{flex:1;}
-.cfg-row-target span{font-size:13px;font-weight:600;color:var(--muted2);}
 
 @media(max-width:980px){
   .main-grid{grid-template-columns:1fr;}
@@ -240,7 +218,6 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
       <button class="btn-io" id="btnImport" type="button">&uarr; Import .xlsx</button>
       <button class="btn-io" id="btnExport" type="button">&darr; Export .xlsx</button>
       <span class="start-pill" id="startPill">Start &middot; &mdash;</span>
-      <button class="btn-gear" id="btnSettings" type="button" aria-label="Settings">&#9881;</button>
       <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none">
     </div>
   </header>
@@ -282,7 +259,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
     <div class="prog-track">
       <div class="bar-proj" id="barProj" style="width:0%"></div>
       <div class="bar-conf" id="barConf" style="width:0%"></div>
-      <div class="prog-tgt" id="progTgt"></div>
+      <div class="prog-tgt" id="progTgt" style="left:60%"></div>
     </div>
     <div class="prog-labels"><span>0%</span><span id="progTgtLabel">target</span><span>100%</span></div>
     <div class="prog-note" id="progNote"></div>
@@ -336,7 +313,8 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
         <div class="form-hint">
           <strong>Local Mode:</strong> data lives in this browser only.<br>
           Export to <code>.xlsx</code> regularly as a backup.<br>
-          Click any calendar day to quick-cycle status.
+          Holidays come from the country preset + <code>CUSTOM_HOLIDAYS</code> at the top of this file.
+          <span class="build-stamp">build <span id="buildStamp">&mdash;</span></span>
         </div>
       </div>
       <div class="log-card">
@@ -348,316 +326,222 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 
 </div>
 
-<div class="settings-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-  <div class="settings-panel">
-    <div class="settings-h">
-      <h3 id="settingsTitle">Settings</h3>
-      <button class="settings-close" id="settingsClose" type="button" aria-label="Close">&#10005;</button>
-    </div>
-    <div class="settings-body">
-      <div class="ss-group">
-        <h4>Tracking</h4>
-        <div class="ff">
-          <label for="cfgStartDate">Start date</label>
-          <input type="date" id="cfgStartDate">
-          <small>Days before this date are excluded from compliance.</small>
-        </div>
-        <div class="ff">
-          <label for="cfgTarget">Target percentage</label>
-          <div class="cfg-row-target">
-            <input type="number" id="cfgTarget" min="1" max="100" step="1" placeholder="60">
-            <span>%</span>
-          </div>
-          <small>Default 60. Lower or raise to match your team's hybrid policy.</small>
-        </div>
-      </div>
-      <div class="ss-group">
-        <h4>Holidays</h4>
-        <div class="ff">
-          <label for="cfgCountry">Country preset</label>
-          <select id="cfgCountry"></select>
-          <small>Federal/national holidays auto-computed for any year.</small>
-        </div>
-        <div class="ff">
-          <label for="cfgCustom">Custom holidays</label>
-          <textarea id="cfgCustom" rows="5" placeholder="2026-12-31  Year-end closure&#10;2026-07-02  Day before Independence Day&#10;# lines starting with # are comments" style="width:100%;padding:10px 11px;background:#FAF8F4;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--text);outline:none;resize:vertical;min-height:90px;"></textarea>
-          <small>One per line: <code>YYYY-MM-DD &lt;optional name&gt;</code>. Adds to the country preset above.</small>
-        </div>
-      </div>
-    </div>
-    <div class="settings-foot">
-      <button class="btn-bulk ghost" id="cfgReset" type="button">Reset to defaults</button>
-      <div class="right">
-        <button class="btn-bulk ghost" id="cfgCancel" type="button">Cancel</button>
-        <button class="btn-bulk" id="cfgSave" type="button">Save</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
-<!-- SheetJS for .xlsx import/export. Pinned for stability; falls back gracefully. -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 "use strict";
 
-// =========== CONFIG ===========
-const STORAGE_KEY = 'attendance-tracker-entries';
-const CONFIG_KEY  = 'attendance-tracker-config';
-// Tweak these baked defaults for your fork. They can also be overridden
-// at runtime via the Settings panel (gear icon), with overrides persisted
-// to localStorage on the user's device.
-const DEFAULT_CONFIG = {
-  startDate: '2026-01-01',
-  targetPct: 60,
-  country:   'US',
-  customHolidays: ''
-};
-let CONFIG = {...DEFAULT_CONFIG};
-let START = {y: 2026, m: 3, d: 13};
+// ===========================================================================
+// CONFIGURATION — Edit these values, save the file. Done.
+// ===========================================================================
+const START_DATE = '2026-01-01';        // YYYY-MM-DD; days before are excluded
+const TARGET_PCT = 60;                  // % of eligible weekdays in office
+const COUNTRY    = 'US';                // for computed federal/national holidays
 
-function loadConfigFromStorage(){
-  try {
-    const raw = localStorage.getItem(CONFIG_KEY);
-    if (raw){ CONFIG = {...DEFAULT_CONFIG, ...JSON.parse(raw)}; }
-  } catch (e){ console.error(e); }
-  applyConfig();
-}
-function saveConfigToStorage(updates){
-  CONFIG = {...CONFIG, ...updates};
-  try { localStorage.setItem(CONFIG_KEY, JSON.stringify(CONFIG)); } catch(e){}
-  applyConfig();
-}
-function clearConfigOverrides(){
-  try { localStorage.removeItem(CONFIG_KEY); } catch(e){}
-  CONFIG = {...DEFAULT_CONFIG};
-  applyConfig();
-}
-function applyConfig(){
-  const parts = (CONFIG.startDate || '2026-04-13').split('-').map(Number);
-  if (parts.length === 3 && parts.every(n => Number.isFinite(n))){
-    START = {y: parts[0], m: parts[1] - 1, d: parts[2]};
-  }
-  const tp = Number(CONFIG.targetPct);
-  CONFIG.targetPct = (isFinite(tp) && tp >= 1 && tp <= 100) ? Math.round(tp) : 60;
-  if (typeof CONFIG.country !== 'string' || !CONFIG.country) CONFIG.country = 'US';
-  CONFIG.country = CONFIG.country.toUpperCase();
-  if (typeof _invalidateHolidayCache === 'function') _invalidateHolidayCache();
-  const sp = document.getElementById('startPill');
-  if (sp && typeof MONTHS !== 'undefined'){
-    const yy = String(START.y).slice(-2);
-    sp.textContent = `Start · ${MONTHS[START.m]?.slice(0,3) || '—'} ${START.d} '${yy}`;
-  }
-  const lbl = document.getElementById('progTgtLabel');
-  if (lbl) lbl.textContent = `${CONFIG.targetPct}% target`;
-  const tt = document.getElementById('progTitle');
-  if (tt) tt.textContent = `${CONFIG.targetPct}% Compliance · Confirmed vs Projected`;
-  const tgt = document.getElementById('progTgt');
-  if (tgt) tgt.style.left = CONFIG.targetPct + '%';
-}
+// Holiday Type column — categories shown in tooltips and the day log.
+// Add/remove/rename freely. The first value tags the country preset rows
+// (when not weekend-shifted); the last is the fallback for the CUSTOM_HOLIDAYS
+// entries below if their type is omitted.
+//
+// Common regional alternatives (rename above to suit your context):
+//   'Public'   — Federal (US), Bank Holiday (UK/IE), Statutory (CA/NZ),
+//                National, Public Holiday
+//   'Regional' — State, Provincial, Local
+//   'Observed' — Substituted, Day in Lieu, Shifted
+//   'Company'  — Floating, Office Closure, Discretionary
+const HOLIDAY_TYPES = ['Public', 'Regional', 'Observed', 'Company'];
+
+// Custom holidays — added on top of the country preset. One object per line.
+const CUSTOM_HOLIDAYS = [
+  // {date: '2026-12-31', name: 'Year-end closure', type: 'Company'},
+  // {date: '2026-04-15', name: "Patriots' Day",    type: 'Regional'},
+];
+// ===========================================================================
+// END OF CONFIGURATION — do not edit below this line.
+// ===========================================================================
+
+const STORAGE_KEY = 'attendance-tracker-entries';
+const APP_BUILD = '2026-04-30-i';
 
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-// =========== HOLIDAY ENGINE ===========
-// Compute holidays algorithmically per country. New Set covers all years; no
-// yearly maintenance. Company-specific days go in the Settings panel's
-// "Custom holidays" textarea.
-
-const COUNTRIES = [
-  {code:'US', label:'United States (federal)'},
-  {code:'UK', label:'United Kingdom (England & Wales)'},
-  {code:'CA', label:'Canada (federal)'},
-  {code:'AU', label:'Australia (national)'},
-  {code:'DE', label:'Germany (federal)'},
-  {code:'FR', label:'France'},
-  {code:'NONE', label:'None — custom only'},
-];
-
-function _ymd(y,m,d){ return `${y}-${pad2(m)}-${pad2(d)}`; }
-function easterSunday(y){
-  const a=y%19, b=Math.floor(y/100), c=y%100, d=Math.floor(b/4), e=b%4;
-  const f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
-  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4;
-  const L=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*L)/451);
-  const month=Math.floor((h+L-7*m+114)/31);
-  const day=((h+L-7*m+114)%31)+1;
-  return {month, day};
-}
-function _shiftDays(y,m,d,offset){ const dt=new Date(y, m-1, d+offset); return _ymd(dt.getFullYear(), dt.getMonth()+1, dt.getDate()); }
-function _easterKey(y, offset){ const e=easterSunday(y); return _shiftDays(y, e.month, e.day, offset); }
-function _nthWeekday(y, m, weekday, n){
-  const first=new Date(y, m-1, 1).getDay();
-  return _ymd(y, m, 1 + ((weekday - first + 7) % 7) + (n - 1) * 7);
-}
-function _lastWeekday(y, m, weekday){
-  const lastDay=new Date(y, m, 0).getDate();
-  const lastDow=new Date(y, m-1, lastDay).getDay();
-  return _ymd(y, m, lastDay - ((lastDow - weekday + 7) % 7));
-}
-function _fixed(y, m, d, name, mode){
-  const dt=new Date(y, m-1, d), dow=dt.getDay();
-  let shift=0;
-  if (mode === 'nearest'){ if (dow===6) shift=-1; else if (dow===0) shift=1; }
-  else if (mode === 'forward'){ if (dow===6) shift=2; else if (dow===0) shift=1; }
-  if (shift === 0) return {key: _ymd(y, m, d), name};
-  const f=new Date(y, m-1, d+shift);
-  return {key: _ymd(f.getFullYear(), f.getMonth()+1, f.getDate()), name: name + ' (obs.)'};
-}
-function _ukChristmasPair(y){
-  const out=[];
-  const c25=new Date(y, 11, 25), b26=new Date(y, 11, 26);
-  let cKey, bKey;
-  if (c25.getDay() === 6){ cKey = _ymd(y, 12, 28); }
-  else if (c25.getDay() === 0){ cKey = _ymd(y, 12, 27); }
-  else { cKey = _ymd(y, 12, 25); }
-  if (b26.getDay() === 6){ bKey = _ymd(y, 12, 28); }
-  else if (b26.getDay() === 0){ bKey = _ymd(y, 12, 27); }
-  else { bKey = _ymd(y, 12, 26); }
-  if (cKey === bKey){ const m=parseKey(bKey); bKey = _ymd(m.y, m.m+1, m.d+1); }
-  out.push({key: cKey, name: cKey === _ymd(y,12,25) ? 'Christmas Day' : 'Christmas Day (subst.)'});
-  out.push({key: bKey, name: bKey === _ymd(y,12,26) ? 'Boxing Day' : 'Boxing Day (subst.)'});
-  return out;
-}
-
-const COUNTRY_RULES = {
-  US: y => [
-    _fixed(y, 1, 1, "New Year's Day", 'nearest'),
-    {key: _nthWeekday(y, 1, 1, 3), name: 'MLK Day'},
-    {key: _nthWeekday(y, 2, 1, 3), name: "Presidents' Day"},
-    {key: _lastWeekday(y, 5, 1), name: 'Memorial Day'},
-    _fixed(y, 6, 19, 'Juneteenth', 'nearest'),
-    _fixed(y, 7, 4, 'Independence Day', 'nearest'),
-    {key: _nthWeekday(y, 9, 1, 1), name: 'Labor Day'},
-    {key: _nthWeekday(y, 10, 1, 2), name: 'Columbus Day'},
-    _fixed(y, 11, 11, 'Veterans Day', 'nearest'),
-    {key: _nthWeekday(y, 11, 4, 4), name: 'Thanksgiving'},
-    {key: _shiftDays(y, 11, parseKey(_nthWeekday(y, 11, 4, 4)).d, 1), name: 'Day After Thanksgiving'},
-    _fixed(y, 12, 25, 'Christmas', 'nearest'),
-  ],
-  UK: y => [
-    _fixed(y, 1, 1, "New Year's Day", 'forward'),
-    {key: _easterKey(y, -2), name: 'Good Friday'},
-    {key: _easterKey(y, 1), name: 'Easter Monday'},
-    {key: _nthWeekday(y, 5, 1, 1), name: 'Early May Bank Holiday'},
-    {key: _lastWeekday(y, 5, 1), name: 'Spring Bank Holiday'},
-    {key: _lastWeekday(y, 8, 1), name: 'Summer Bank Holiday'},
-    ..._ukChristmasPair(y),
-  ],
-  CA: y => [
-    _fixed(y, 1, 1, "New Year's Day", 'forward'),
-    {key: _easterKey(y, -2), name: 'Good Friday'},
-    (() => { const md=new Date(y, 4, 24); const back=(md.getDay()+6)%7; return {key: _ymd(y, 5, 24-back), name: 'Victoria Day'}; })(),
-    _fixed(y, 7, 1, 'Canada Day', 'forward'),
-    {key: _nthWeekday(y, 9, 1, 1), name: 'Labour Day'},
-    {key: _nthWeekday(y, 10, 1, 2), name: 'Thanksgiving'},
-    _fixed(y, 11, 11, 'Remembrance Day', 'forward'),
-    _fixed(y, 12, 25, 'Christmas', 'forward'),
-    _fixed(y, 12, 26, 'Boxing Day', 'forward'),
-  ],
-  AU: y => [
-    _fixed(y, 1, 1, "New Year's Day", 'forward'),
-    _fixed(y, 1, 26, 'Australia Day', 'forward'),
-    {key: _easterKey(y, -2), name: 'Good Friday'},
-    {key: _easterKey(y, 1), name: 'Easter Monday'},
-    _fixed(y, 4, 25, 'Anzac Day', 'none'),
-    _fixed(y, 12, 25, 'Christmas', 'forward'),
-    _fixed(y, 12, 26, 'Boxing Day', 'forward'),
-  ],
-  DE: y => [
-    _fixed(y, 1, 1, 'Neujahr', 'none'),
-    {key: _easterKey(y, -2), name: 'Karfreitag'},
-    {key: _easterKey(y, 1), name: 'Ostermontag'},
-    _fixed(y, 5, 1, 'Tag der Arbeit', 'none'),
-    {key: _easterKey(y, 39), name: 'Christi Himmelfahrt'},
-    {key: _easterKey(y, 50), name: 'Pfingstmontag'},
-    _fixed(y, 10, 3, 'Tag der Deutschen Einheit', 'none'),
-    _fixed(y, 12, 25, '1. Weihnachtstag', 'none'),
-    _fixed(y, 12, 26, '2. Weihnachtstag', 'none'),
-  ],
-  FR: y => [
-    _fixed(y, 1, 1, "Jour de l'an", 'none'),
-    {key: _easterKey(y, 1), name: 'Lundi de Pâques'},
-    _fixed(y, 5, 1, 'Fête du Travail', 'none'),
-    _fixed(y, 5, 8, 'Victoire 1945', 'none'),
-    {key: _easterKey(y, 39), name: 'Ascension'},
-    {key: _easterKey(y, 50), name: 'Lundi de Pentecôte'},
-    _fixed(y, 7, 14, 'Fête nationale', 'none'),
-    _fixed(y, 8, 15, 'Assomption', 'none'),
-    _fixed(y, 11, 1, 'Toussaint', 'none'),
-    _fixed(y, 11, 11, 'Armistice', 'none'),
-    _fixed(y, 12, 25, 'Noël', 'none'),
-  ],
-  NONE: () => [],
-};
-
-const _holCache = new Map();
-function _holidaysFor(year){
-  const country=(CONFIG.country || 'US').toUpperCase();
-  const ck=country + '-' + year;
-  if (_holCache.has(ck)) return _holCache.get(ck);
-  const fn=COUNTRY_RULES[country] || COUNTRY_RULES.US;
-  const map={};
-  const yearPrefix=String(year) + '-';
-  for (const yr of [year, year + 1]){
-    for (const {key, name} of fn(yr)){
-      if (key && key.startsWith(yearPrefix)) map[key] = name;
-    }
-  }
-  _holCache.set(ck, map);
-  return map;
-}
-function _invalidateHolidayCache(){ _holCache.clear(); _customHolidaysCache = null; }
-
-let _customHolidaysCache = null;
-function _customHolidaysMap(){
-  if (_customHolidaysCache) return _customHolidaysCache;
-  const out={};
-  const text=CONFIG.customHolidays || '';
-  for (const raw of text.split('\n')){
-    const line=raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const m=line.match(/^(\d{4}-\d{2}-\d{2})\s*(?:[-—:/\\]+|\/\/)?\s*(.*)$/);
-    if (m){ out[m[1]] = (m[2] || 'Custom Holiday').trim(); }
-  }
-  _customHolidaysCache = out;
-  return out;
-}
-
-function holidayName(dateKey){
-  if (!dateKey || dateKey.length < 4) return null;
-  const year=+dateKey.slice(0, 4);
-  if (!Number.isFinite(year)) return null;
-  const builtin=_holidaysFor(year);
-  if (builtin[dateKey]) return builtin[dateKey];
-  const custom=_customHolidaysMap();
-  if (custom[dateKey]) return custom[dateKey];
-  return null;
-}
-
 const _now = new Date();
 const CAL_END_Y = _now.getFullYear() + 2;
 const CAL_END_M = _now.getMonth();
 
-// =========== STATE ===========
-let entries = {};       // { 'YYYY-MM-DD': {type, note} }
+const pad2 = n => String(n).padStart(2,'0');
+
+let START = (() => {
+  const p = (START_DATE || '2026-01-01').split('-').map(Number);
+  return {y: p[0] || 2026, m: (p[1] || 1) - 1, d: p[2] || 1};
+})();
+
+// =============================================================
+// HOLIDAY COMPUTATION ENGINE
+// =============================================================
+function _ymd(y,m,d){ return `${y}-${pad2(m)}-${pad2(d)}`; }
+function easterSunday(y){
+  const a=y%19, b=Math.floor(y/100), c=y%100;
+  const d=Math.floor(b/4), e=b%4;
+  const f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4;
+  const L=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*L)/451);
+  return {month: Math.floor((h+L-7*m+114)/31), day: ((h+L-7*m+114)%31)+1};
+}
+function _shiftDays(y,m,d,off){ const dt=new Date(y,m-1,d+off); return _ymd(dt.getFullYear(),dt.getMonth()+1,dt.getDate()); }
+function _easterKey(y,off){ const e=easterSunday(y); return _shiftDays(y,e.month,e.day,off); }
+function _nthWeekday(y,m,wd,n){
+  const first=new Date(y,m-1,1).getDay();
+  return _ymd(y,m,1+((wd-first+7)%7)+(n-1)*7);
+}
+function _lastWeekday(y,m,wd){
+  const ld=new Date(y,m,0).getDate();
+  const ldow=new Date(y,m-1,ld).getDay();
+  return _ymd(y,m,ld-((ldow-wd+7)%7));
+}
+function _fixed(y,m,d,name,mode){
+  const dt=new Date(y,m-1,d), dow=dt.getDay();
+  let shift=0;
+  if (mode==='nearest'){ if (dow===6) shift=-1; else if (dow===0) shift=1; }
+  else if (mode==='forward'){ if (dow===6) shift=2; else if (dow===0) shift=1; }
+  if (shift===0) return {key:_ymd(y,m,d),name,observed:false};
+  const f=new Date(y,m-1,d+shift);
+  return {key:_ymd(f.getFullYear(),f.getMonth()+1,f.getDate()),name:name+' (obs.)',observed:true};
+}
+function _ukChristmasPair(y){
+  const out=[];
+  const c25=new Date(y,11,25), b26=new Date(y,11,26);
+  let cKey, bKey;
+  if (c25.getDay()===6) cKey=_ymd(y,12,28); else if (c25.getDay()===0) cKey=_ymd(y,12,27); else cKey=_ymd(y,12,25);
+  if (b26.getDay()===6) bKey=_ymd(y,12,28); else if (b26.getDay()===0) bKey=_ymd(y,12,27); else bKey=_ymd(y,12,26);
+  if (cKey===bKey){ const m=parseKey(bKey); bKey=_ymd(m.y,m.m+1,m.d+1); }
+  const cObs=cKey!==_ymd(y,12,25), bObs=bKey!==_ymd(y,12,26);
+  out.push({key:cKey,name:cObs?'Christmas Day (subst.)':'Christmas Day',observed:cObs});
+  out.push({key:bKey,name:bObs?'Boxing Day (subst.)':'Boxing Day',observed:bObs});
+  return out;
+}
+const COUNTRY_RULES = {
+  US: y => [
+    _fixed(y,1,1,"New Year's Day",'nearest'),
+    {key:_nthWeekday(y,1,1,3),name:'MLK Day',observed:false},
+    {key:_nthWeekday(y,2,1,3),name:"Presidents' Day",observed:false},
+    {key:_lastWeekday(y,5,1),name:'Memorial Day',observed:false},
+    _fixed(y,6,19,'Juneteenth','nearest'),
+    _fixed(y,7,4,'Independence Day','nearest'),
+    {key:_nthWeekday(y,9,1,1),name:'Labor Day',observed:false},
+    {key:_nthWeekday(y,10,1,2),name:'Columbus Day',observed:false},
+    _fixed(y,11,11,'Veterans Day','nearest'),
+    {key:_nthWeekday(y,11,4,4),name:'Thanksgiving',observed:false},
+    {key:_shiftDays(y,11,parseKey(_nthWeekday(y,11,4,4)).d,1),name:'Day After Thanksgiving',observed:false},
+    _fixed(y,12,25,'Christmas','nearest'),
+  ],
+  UK: y => [
+    _fixed(y,1,1,"New Year's Day",'forward'),
+    {key:_easterKey(y,-2),name:'Good Friday',observed:false},
+    {key:_easterKey(y,1),name:'Easter Monday',observed:false},
+    {key:_nthWeekday(y,5,1,1),name:'Early May Bank Holiday',observed:false},
+    {key:_lastWeekday(y,5,1),name:'Spring Bank Holiday',observed:false},
+    {key:_lastWeekday(y,8,1),name:'Summer Bank Holiday',observed:false},
+    ..._ukChristmasPair(y),
+  ],
+  CA: y => [
+    _fixed(y,1,1,"New Year's Day",'forward'),
+    {key:_easterKey(y,-2),name:'Good Friday',observed:false},
+    (() => { const md=new Date(y,4,24); const back=(md.getDay()+6)%7; return {key:_ymd(y,5,24-back),name:'Victoria Day',observed:false}; })(),
+    _fixed(y,7,1,'Canada Day','forward'),
+    {key:_nthWeekday(y,9,1,1),name:'Labour Day',observed:false},
+    {key:_nthWeekday(y,10,1,2),name:'Thanksgiving',observed:false},
+    _fixed(y,11,11,'Remembrance Day','forward'),
+    _fixed(y,12,25,'Christmas','forward'),
+    _fixed(y,12,26,'Boxing Day','forward'),
+  ],
+  AU: y => [
+    _fixed(y,1,1,"New Year's Day",'forward'),
+    _fixed(y,1,26,'Australia Day','forward'),
+    {key:_easterKey(y,-2),name:'Good Friday',observed:false},
+    {key:_easterKey(y,1),name:'Easter Monday',observed:false},
+    _fixed(y,4,25,'Anzac Day','none'),
+    _fixed(y,12,25,'Christmas','forward'),
+    _fixed(y,12,26,'Boxing Day','forward'),
+  ],
+  DE: y => [
+    _fixed(y,1,1,'Neujahr','none'),
+    {key:_easterKey(y,-2),name:'Karfreitag',observed:false},
+    {key:_easterKey(y,1),name:'Ostermontag',observed:false},
+    _fixed(y,5,1,'Tag der Arbeit','none'),
+    {key:_easterKey(y,39),name:'Christi Himmelfahrt',observed:false},
+    {key:_easterKey(y,50),name:'Pfingstmontag',observed:false},
+    _fixed(y,10,3,'Tag der Deutschen Einheit','none'),
+    _fixed(y,12,25,'1. Weihnachtstag','none'),
+    _fixed(y,12,26,'2. Weihnachtstag','none'),
+  ],
+  FR: y => [
+    _fixed(y,1,1,"Jour de l'an",'none'),
+    {key:_easterKey(y,1),name:'Lundi de Pâques',observed:false},
+    _fixed(y,5,1,'Fête du Travail','none'),
+    _fixed(y,5,8,'Victoire 1945','none'),
+    {key:_easterKey(y,39),name:'Ascension',observed:false},
+    {key:_easterKey(y,50),name:'Lundi de Pentecôte',observed:false},
+    _fixed(y,7,14,'Fête nationale','none'),
+    _fixed(y,8,15,'Assomption','none'),
+    _fixed(y,11,1,'Toussaint','none'),
+    _fixed(y,11,11,'Armistice','none'),
+    _fixed(y,12,25,'Noël','none'),
+  ],
+  NONE: () => [],
+};
+
+function rebuildHolidaysMap(){
+  const map = {};
+  const fn = COUNTRY_RULES[(COUNTRY || 'US').toUpperCase()] || COUNTRY_RULES.US;
+  const fallbackType = HOLIDAY_TYPES[HOLIDAY_TYPES.length - 1] || 'Custom';
+  const currentYear = _now.getFullYear();
+  for (const targetYear of [currentYear, currentYear + 1]){
+    const yp = String(targetYear) + '-';
+    for (const yr of [targetYear, targetYear + 1]){
+      for (const h of fn(yr)){
+        if (!h.key || !h.key.startsWith(yp)) continue;
+        const t = h.observed ? 'Observed' : (HOLIDAY_TYPES[0] || 'Public');
+        if (!map[h.key]){ map[h.key] = {name: h.name, type: t}; }
+      }
+    }
+  }
+  for (const h of (CUSTOM_HOLIDAYS || [])){
+    if (h?.date && /^\d{4}-\d{2}-\d{2}$/.test(h.date)){
+      map[h.date] = {
+        name: h.name || 'Custom Holiday',
+        type: h.type || fallbackType
+      };
+    }
+  }
+  HOLIDAYS_MAP = map;
+}
+
+// =============================================================
+// STATE
+// =============================================================
+let entries = {};
+let HOLIDAYS_MAP = {};
 let viewY = _now.getFullYear();
 let viewM = _now.getMonth();
 
-// =========== HELPERS ===========
-const pad2 = n => String(n).padStart(2,'0');
+// =============================================================
+// HELPERS
+// =============================================================
 const key = (y,m,d) => `${y}-${pad2(m+1)}-${pad2(d)}`;
 const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return {y, m:m-1, d}; };
 const today = () => { const n = new Date(); return {y:n.getFullYear(), m:n.getMonth(), d:n.getDate()}; };
 const isWknd = (y,m,d) => { const w = new Date(y,m,d).getDay(); return w === 0 || w === 6; };
 const isPre = (y,m,d) => y < START.y || (y === START.y && m < START.m) || (y === START.y && m === START.m && d < START.d);
-const isHol = k => holidayName(k) !== null;
+const isHol = k => HOLIDAYS_MAP[k] !== undefined;
+const holidayName = k => HOLIDAYS_MAP[k]?.name || null;
+const holidayType = k => HOLIDAYS_MAP[k]?.type || null;
 const isConf = t => !!t && t.startsWith('s-');
 const isPlan = t => !!t && t.startsWith('p-');
-const baseT  = t => t ? t.replace(/^[sp]-/, '') : null;
+const baseT = t => t ? t.replace(/^[sp]-/, '') : null;
 const isExcl = (type, k) => isHol(k) || ['pto','sick','travel','fhol'].includes(baseT(type));
-const isOff  = t => baseT(t) === 'office';
+const isOff = t => baseT(t) === 'office';
 
 function serialToYMD(serial){
   const ms = Date.UTC(1899, 11, 30) + serial * 86400000;
@@ -669,21 +553,13 @@ function normalizeDateCell(raw){
   if (typeof raw === 'number' && isFinite(raw)) return serialToYMD(raw);
   const s = String(raw).trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-  // ISO with time/zone — extract YMD literally to avoid Date()'s timezone shift
   const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
-  // US-style M/D/YYYY
   const us = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (us) return `${us[3]}-${pad2(+us[1])}-${pad2(+us[2])}`;
   const d = new Date(s);
   if (!isNaN(d.getTime())) return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
   return null;
-}
-
-// Local-time timestamp for the Updated column in XLSX exports.
-function localTimestamp(){
-  const d = new Date();
-  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
 }
 function normalizeType(raw){
   if (!raw) return null;
@@ -693,23 +569,28 @@ function normalizeType(raw){
   if (!t.startsWith('s-') && !t.startsWith('p-')) t = 's-' + t;
   return t;
 }
+function localTimestamp(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
 
-// =========== STORAGE ===========
+// =============================================================
+// STORAGE
+// =============================================================
 function loadFromStorage(){
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     entries = raw ? JSON.parse(raw) : {};
-  } catch (e){
-    console.error(e);
-    entries = {};
-  }
+  } catch (e){ console.error(e); entries = {}; }
 }
 function saveToStorage(){
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }
   catch (e){ console.error(e); toast('Storage full — export to .xlsx', 'err'); }
 }
 
-// =========== STATS ===========
+// =============================================================
+// STATS
+// =============================================================
 function calcStats(y,m){
   const t = today();
   const dim = new Date(y, m+1, 0).getDate();
@@ -727,11 +608,13 @@ function calcStats(y,m){
   }
   const cr = pastElig > 0 ? Math.round(cOff / pastElig * 100) : 0;
   const pr = elig > 0 ? Math.round((cOff + pOff) / elig * 100) : 0;
-  const need = Math.max(0, Math.ceil(elig * CONFIG.targetPct / 100) - cOff - pOff);
+  const need = Math.max(0, Math.ceil(elig * TARGET_PCT / 100) - cOff - pOff);
   return {elig, pastElig, futureEl, cOff, pOff, cr, pr, need};
 }
 
-// =========== ACTIONS ===========
+// =============================================================
+// ACTIONS
+// =============================================================
 function applyChange({k, type, note, action}){
   if (action === 'delete'){ delete entries[k]; }
   else { entries[k] = {type, note: note != null ? note : (entries[k]?.note ?? '')}; }
@@ -745,8 +628,8 @@ function submitEntry(){
   if (!dv){ toast('Pick a date first.', 'err'); return; }
   const {y, m, d} = parseKey(dv);
   if (isWknd(y,m,d)){ toast('Weekends not tracked.', 'err'); return; }
-  if (isPre(y,m,d)){ toast(`Before ${CONFIG.startDate} start.`, 'err'); return; }
-  if (isHol(dv)){ toast('Fixed holiday — use Floating Holiday instead.', 'err'); return; }
+  if (isPre(y,m,d)){ toast(`Before ${START_DATE} start.`, 'err'); return; }
+  if (isHol(dv)){ toast(`That is a ${holidayType(dv) || 'holiday'} — auto-excluded.`, 'err'); return; }
   applyChange({k: dv, type, note, action: 'set'});
   g('fNote').value = '';
   viewY = y; viewM = m;
@@ -768,7 +651,6 @@ function quickCycle(k){
   if (next === null) applyChange({k, action: 'delete'});
   else applyChange({k, type: next, note: entries[k]?.note || '', action: 'set'});
 }
-
 function getStalePlanned(){
   const t = today();
   const todayKey = key(t.y, t.m, t.d);
@@ -785,7 +667,6 @@ function bulkConfirmStale(){
   render();
   toast(`Confirmed ${stale.length} ✓`, 'ok');
 }
-
 function updateTypeFromDate(){
   const dv = g('fDate').value;
   if (!dv) return;
@@ -802,7 +683,9 @@ function updateTypeFromDate(){
   }
 }
 
-// =========== XLSX IMPORT / EXPORT ===========
+// =============================================================
+// XLSX IMPORT / EXPORT
+// =============================================================
 function exportXlsx(){
   if (typeof XLSX === 'undefined'){ toast('XLSX library not loaded — check your connection.', 'err'); return; }
   const rows = [['Date','Day','Type','Note','Updated']];
@@ -821,7 +704,6 @@ function exportXlsx(){
   XLSX.writeFile(wb, `attendance-${stamp}.xlsx`);
   toast(`Exported ${sortedKeys.length} entries`, 'ok');
 }
-
 function importXlsx(file){
   if (typeof XLSX === 'undefined'){ toast('XLSX library not loaded — check your connection.', 'err'); return; }
   const reader = new FileReader();
@@ -857,18 +739,18 @@ function importXlsx(file){
   reader.readAsArrayBuffer(file);
 }
 
-// =========== RENDER ===========
+// =============================================================
+// RENDER
+// =============================================================
 function render(){
   const t = today();
   const s = calcStats(viewY, viewM);
-
   g('monthName').textContent = MONTHS[viewM];
   g('monthYear').textContent = String(viewY);
   g('btnPrev').disabled = (viewY === START.y && viewM === START.m);
   g('btnNext').disabled = (viewY === CAL_END_Y && viewM >= CAL_END_M);
-
   const cr = s.cr, pr = s.pr;
-  const T = CONFIG.targetPct;
+  const T = TARGET_PCT;
   const Twarn = T * 0.75;
   setVal('sRate', cr + '%', cr >= T ? 'var(--teal-dk)' : cr >= Twarn ? 'var(--amber)' : 'var(--rose)');
   setVal('sProj', pr + '%', pr >= T ? 'var(--travel)'  : pr >= Twarn ? 'var(--amber)' : 'var(--rose)');
@@ -876,12 +758,10 @@ function render(){
   const n = s.need;
   setVal('sNeed', n === 0 ? '✓' : String(n), n === 0 ? 'var(--teal-dk)' : n <= 3 ? 'var(--amber)' : 'var(--rose)');
   g('sNeedSub').textContent = n === 0 ? 'Target met' : `${s.futureEl} eligible day${s.futureEl !== 1 ? 's' : ''} remaining`;
-
   g('barConf').style.width = Math.min(cr, 100) + '%';
   g('barConf').style.background = cr >= T ? '#22c55e' : cr >= Twarn ? '#f59e0b' : '#ef4444';
   g('barProj').style.width = Math.min(pr, 100) + '%';
   setVal('progPct', cr + '%', cr >= T ? 'var(--teal-dk)' : cr >= Twarn ? 'var(--amber)' : 'var(--rose)');
-
   const pn = g('progNote');
   if (n === 0){
     pn.innerHTML = `<strong style="color:var(--teal-dk)">✓ ${T}% requirement met for this month.</strong>`;
@@ -891,16 +771,13 @@ function render(){
       <span>${s.futureEl} eligible day${s.futureEl !== 1 ? 's' : ''} remaining</span> &middot;
       <strong style="color:${can ? 'var(--office)' : 'var(--rose)'}">${can ? 'On track if plan holds' : 'At risk — review your plan'}</strong>`;
   }
-
   const stale = getStalePlanned();
   const sb = g('staleBanner');
   if (stale.length > 0){ sb.classList.add('show'); g('staleCount').textContent = stale.length; }
   else { sb.classList.remove('show'); }
-
   renderCal(t, viewY, viewM, stale);
   renderLog(viewY, viewM);
 }
-
 function renderCal(t, y, m, stale){
   const grid = g('calGrid');
   grid.innerHTML = '';
@@ -923,7 +800,6 @@ function renderCal(t, y, m, stale){
     else if (type) cell.classList.add(type);
     if (tod) cell.classList.add('x-t');
     if (staleSet.has(k)) cell.classList.add('stale');
-
     const num = mk('div', 'dn'); num.textContent = d; cell.appendChild(num);
     if (!wknd && !pre){
       let tag = '';
@@ -944,12 +820,13 @@ function renderCal(t, y, m, stale){
       cell.title = ent ? `${type}${ent.note ? ' — ' + ent.note : ''} (click to cycle)` : 'Click to log this day';
       cell.onclick = () => quickCycle(k);
     } else if (hol){
-      cell.title = holidayName(k) || 'Company Holiday';
+      const hn = holidayName(k) || 'Holiday';
+      const ht = holidayType(k);
+      cell.title = ht ? `${hn} (${ht})` : hn;
     }
     grid.appendChild(cell);
   }
 }
-
 function renderLog(y, m){
   const pfx = key(y, m, 1).slice(0, 7);
   g('logTitle').textContent = MONTHS[m] + ' ' + y + ' Log';
@@ -960,7 +837,10 @@ function renderLog(y, m){
   const holEnt = [];
   for (let d = 1; d <= dim; d++){
     const k = key(y, m, d);
-    if (isHol(k) && !entries[k]) holEnt.push([k, {type:'hol', note: holidayName(k) || 'Company Holiday', fixed: true}]);
+    if (isHol(k) && !entries[k]){
+      const h = HOLIDAYS_MAP[k];
+      holEnt.push([k, {type:'hol', note: h.name, htype: h.type, fixed: true}]);
+    }
   }
   const all = [...userEnt, ...holEnt].sort(([a],[b]) => b.localeCompare(a));
   const list = g('logList');
@@ -976,14 +856,17 @@ function renderLog(y, m){
     const planned = isPlan(ent.type);
     const fixed = ent.fixed;
     const item = mk('div', 'log-item' + (planned ? ' is-plan' : ''));
-
     const dEl = mk('div', 'ld'); dEl.textContent = MONTHS[em].slice(0,3) + ' ' + ed;
     const wEl = mk('div', 'lw'); wEl.textContent = dow;
     const badges = mk('div', 'lb');
-    const sp = mk('span', 'pill ' + (fixed ? 'pk-hol' : planned ? 'pk-plan' : 'pk-conf'));
-    sp.textContent = fixed ? 'Holiday' : planned ? 'Planned' : 'Confirmed';
-    badges.appendChild(sp);
-    if (!fixed){
+    if (fixed){
+      const sp = mk('span', 'pill pk-hol');
+      sp.textContent = ent.htype || 'Holiday';
+      badges.appendChild(sp);
+    } else {
+      const sp = mk('span', 'pill ' + (planned ? 'pk-plan' : 'pk-conf'));
+      sp.textContent = planned ? 'Planned' : 'Confirmed';
+      badges.appendChild(sp);
       const tp = mk('span', 'pill pk-' + b);
       tp.textContent = b === 'office' ? 'Office' : b === 'remote' ? 'Remote'
         : b === 'pto' ? 'PTO' : b === 'sick' ? 'Sick'
@@ -1007,7 +890,9 @@ function renderLog(y, m){
   });
 }
 
-// =========== UTILS ===========
+// =============================================================
+// UTILS
+// =============================================================
 const g = id => document.getElementById(id);
 const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
 const setVal = (id, val, color) => { const e = g(id); e.textContent = val; if (color) e.style.color = color; };
@@ -1030,58 +915,22 @@ function nextMonth(){
   render();
 }
 
-// =========== SETTINGS UI ===========
-function populateCountryDropdown(){
-  const sel = g('cfgCountry');
-  if (!sel || sel.children.length) return;
-  for (const c of COUNTRIES){
-    const o = document.createElement('option');
-    o.value = c.code; o.textContent = c.label;
-    sel.appendChild(o);
+// =============================================================
+// INIT
+// =============================================================
+console.log('%c[Attendance Tracker] build ' + APP_BUILD, 'color:#0D7A5C;font-weight:600');
+{
+  const bs = g('buildStamp'); if (bs) bs.textContent = APP_BUILD;
+  const sp = g('startPill');
+  if (sp){
+    const yy = String(START.y).slice(-2);
+    sp.textContent = `Start · ${MONTHS[START.m]?.slice(0,3) || '—'} ${START.d} '${yy}`;
   }
+  g('progTgtLabel').textContent = `${TARGET_PCT}% target`;
+  g('progTitle').textContent = `${TARGET_PCT}% Compliance · Confirmed vs Projected`;
+  g('progTgt').style.left = TARGET_PCT + '%';
 }
-function openSettings(){
-  populateCountryDropdown();
-  g('cfgStartDate').value = CONFIG.startDate || '';
-  g('cfgTarget').value    = CONFIG.targetPct || 60;
-  g('cfgCountry').value   = (CONFIG.country || 'US').toUpperCase();
-  g('cfgCustom').value    = CONFIG.customHolidays || '';
-  g('settingsOverlay').classList.add('show');
-  setTimeout(() => g('cfgStartDate').focus(), 50);
-}
-function closeSettings(){ g('settingsOverlay').classList.remove('show'); }
-function handleSaveSettings(){
-  const startDate      = g('cfgStartDate').value.trim();
-  const targetPct      = parseInt(g('cfgTarget').value, 10);
-  const country        = (g('cfgCountry').value || 'US').toUpperCase();
-  const customHolidays = g('cfgCustom').value || '';
-  if (!startDate || !/^\d{4}-\d{2}-\d{2}$/.test(startDate)){ toast('Start date must be YYYY-MM-DD.', 'err'); return; }
-  if (!isFinite(targetPct) || targetPct < 1 || targetPct > 100){ toast('Target % must be 1–100.', 'err'); return; }
-  if (!COUNTRY_RULES[country]){ toast('Unknown country.', 'err'); return; }
-  const badLines = [];
-  for (const raw of customHolidays.split('\n')){
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    if (!/^\d{4}-\d{2}-\d{2}\b/.test(line)) badLines.push(line);
-  }
-  if (badLines.length){
-    if (!confirm(`These custom-holiday lines don't start with YYYY-MM-DD and will be ignored:\n\n${badLines.slice(0,5).join('\n')}\n\nSave anyway?`)) return;
-  }
-  saveConfigToStorage({startDate, targetPct, country, customHolidays});
-  closeSettings();
-  render();
-  toast('Settings saved ✓', 'ok');
-}
-function handleResetSettings(){
-  if (!confirm('Reset settings to defaults?')) return;
-  clearConfigOverrides();
-  closeSettings();
-  render();
-  toast('Reset', 'ok');
-}
-
-// =========== INIT ===========
-loadConfigFromStorage();
+rebuildHolidaysMap();
 loadFromStorage();
 const _t = today();
 g('fDate').value = key(_t.y, _t.m, _t.d);
@@ -1105,16 +954,8 @@ g('btnImport').addEventListener('click', () => g('fileInput').click());
 g('fileInput').addEventListener('change', e => {
   const f = e.target.files?.[0];
   if (f) importXlsx(f);
-  e.target.value = ''; // allow re-importing the same file
+  e.target.value = '';
 });
-g('btnSettings').addEventListener('click', openSettings);
-g('settingsClose').addEventListener('click', closeSettings);
-g('cfgCancel').addEventListener('click', closeSettings);
-g('cfgSave').addEventListener('click', handleSaveSettings);
-g('cfgReset').addEventListener('click', handleResetSettings);
-g('settingsOverlay').addEventListener('click', e => { if (e.target === g('settingsOverlay')) closeSettings(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && g('settingsOverlay').classList.contains('show')) closeSettings(); });
-
 render();
 </script>
 </body>
