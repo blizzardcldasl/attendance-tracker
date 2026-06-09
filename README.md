@@ -1,167 +1,103 @@
 # Hybrid Attendance Tracker
 
-A single-file static web app for tracking your in-office days against a hybrid-policy target (default 60% of eligible weekdays). Two flavors:
-
-- **Cloud** (`index.html`) — syncs to a Google Sheet you own, multi-device. ~20 minutes one-time OAuth setup, then any browser/device works.
-- **Local** (`index-local.html`) — zero accounts, data lives in your browser, export/import via `.xlsx`. 30 seconds to set up.
+A single-file static web app for tracking your in-office days against a hybrid-policy
+target (default 60% of eligible weekdays). One adaptive HTML file — pick where your data
+lives, set everything up in-app, done.
 
 No build tools. No frameworks. No tracking. Vanilla HTML/CSS/JS in one file.
 
-## Setup model — one config block, edit, deploy
+> **Just want to use it? → [INSTRUCTIONS.md](INSTRUCTIONS.md)** (setup, storage modes, daily use).
 
-Both files have a clearly-marked `CONFIGURATION` block at the top. You edit those values in any text editor, save, and deploy the file. There is no in-app settings panel, no localStorage credentials, no setup link to share — the deployed file *is* the configuration. Open the URL on any browser/device and it just works.
+## What changed (unified rebuild)
 
-### Cloud version — `index.html`
+This used to be two hand-maintained files (`index.html` cloud + `index-local.html` local)
+configured by editing a code block at the top. They've been **merged into one app** with an
+in-app Settings panel, so there's nothing to edit in source. Choose a storage mode on first
+run; change anything later under **Settings (⚙)**.
 
-```js
-// =============================================================
-// CONFIGURATION — Edit these values, save, deploy. Done.
-// =============================================================
-const SHEET_ID    = '';                  // /spreadsheets/d/[THIS]/edit
-const SHEET_TAB   = 'Tracker';
-const HOLIDAY_TAB = 'Holidays';
-const CLIENT_ID   = '';                  // OAuth Client ID — see SETUP.md
-const START_DATE  = '2026-01-01';
-const TARGET_PCT  = 60;
-const COUNTRY     = 'US';                // initial Holidays tab seed only
+## Storage modes
 
-const HOLIDAY_TYPES = ['Public', 'Regional', 'Observed', 'Company'];
-
-const SEED_CUSTOM_HOLIDAYS = [
-  // {date: '2026-12-31', name: 'Year-end closure', type: 'Company'},
-];
-```
-
-### Local version — `index-local.html`
-
-```js
-const START_DATE = '2026-01-01';
-const TARGET_PCT = 60;
-const COUNTRY    = 'US';
-const HOLIDAY_TYPES = ['Public', 'Regional', 'Observed', 'Company'];
-
-const CUSTOM_HOLIDAYS = [
-  // {date: '2026-12-31', name: 'Year-end closure', type: 'Company'},
-];
-```
-
-That's it. See [SETUP.md](SETUP.md) for the full Google Cloud / OAuth / hosting walkthrough.
-
-## How holidays work
-
-### Cloud version
-
-On first sign-in, the app creates a `Holidays` tab in your Sheet alongside `Tracker` and seeds it with:
-
-- Federal/national holidays for the current and next calendar year, computed from the `COUNTRY` preset (no static lookup table to maintain — works for 2028, 2030, 2050).
-- Anything you put in `SEED_CUSTOM_HOLIDAYS` at the top of the file.
-
-After that, **the sheet is the source of truth**. Open `Holidays` in Google Sheets and:
-
-| A: Date | B: Name | C: Type |
-|---|---|---|
-| 2026-01-01 | New Year's Day | Public |
-| 2026-07-03 | Independence Day (obs.) | Observed |
-| 2026-11-26 | Thanksgiving | Public |
-| 2026-12-31 | Year-end closure | Company |
-
-Add rows for company-specific days, regional days, anything. Delete rows your company doesn't observe. The app reads `Holidays!A2:C` on every sign-in and uses every row as a holiday — Type is just metadata for your own organization.
-
-When the app moves into a new year, you add the next year's rows yourself. The country preset is for seeding, not auto-extension.
-
-### Local version
-
-`CUSTOM_HOLIDAYS` near the top of `index-local.html` is added on top of the country preset (computed at runtime). Edit the array, save, reload.
-
-### Holiday Type categories
-
-Default values: `'Public', 'Regional', 'Observed', 'Company'`. Free-form — rename/add/remove in the array if your context uses different terms.
-
-| Category | Meaning |
-|---|---|
-| Public | Legally mandated holidays. Federal (US), Bank Holiday (UK/IE), Statutory (CA/NZ), National. |
-| Regional | State, provincial, or city-specific (e.g., Patriots' Day in MA). |
-| Observed | When a public holiday falls on a weekend, the day-off shifts to a weekday. Auto-tagged for country-preset shifts. |
-| Company | Discretionary employer days — floating holidays, year-end closures, anniversary days. |
-
-## How holidays affect compliance math
-
-Adding a row to the Holidays tab (cloud) or to `CUSTOM_HOLIDAYS` (local) **reduces eligible weekdays by 1** and reduces "Still Needed" proportionally:
-
-- `Eligible Days = weekdays in month, on/after start, excluding holidays and PTO/Sick/Travel/Floating`
-- `Still Needed = ceil(Eligible × TARGET_PCT/100) − confirmed office − planned office`
-
-So if April has 14 eligible days and target is 60%, you need 9 office days. Add one company holiday on a weekday → eligible drops to 13, you now only need 8.
-
-## Why no in-app settings panel
-
-This codebase used to have one. It introduced a long tail of bugs around localStorage credentials, OAuth account-switching, settings sync, etc. The simplest, most reliable answer turned out to be: edit one block at the top of one file, deploy, never touch it again. Holidays are the one thing that genuinely needs to be edited regularly — that's why they live in the Sheet, where they belong.
+| Mode | Setup | Notes |
+|------|-------|-------|
+| **This device** | none | Data in `localStorage`, this browser only. Instant start. |
+| **Google Sheet (No OAuth)** | paste one Web App URL | Syncs to a Sheet you own via a small **Apps Script** Web App. No Google Cloud project, no OAuth consent screen. **Recommended for syncing.** See [`apps-script/Code.gs`](apps-script/Code.gs) + [`apps-script/SMOKE-TEST.md`](apps-script/SMOKE-TEST.md). |
+| **Sheet · OAuth** | Sheet ID + OAuth Client ID | Advanced. Direct Sheets v4 API; lower latency; needs a Google Cloud OAuth client (see [SETUP.md](SETUP.md)). |
 
 ## Features
 
-- **Click-to-cycle calendar** — click any eligible day to step through Office → Remote → Plan-Office → Plan-PTO → Plan-Travel → empty
-- **Confirmed vs planned** — solid border = it happened, dashed border = upcoming intent. Past planned days that you didn't promote get an amber warning ring and a banner offering a one-click bulk confirm
-- **Live compliance math** — Confirmed Rate, Projected Rate, Eligible Days, Still Needed; progress bar with target marker
-- **Smart form date** — picking a future date defaults the type to Planned; picking today/past defaults to Confirmed
-- **Holiday-aware** — Public/Regional/Observed/Company days exclude from eligible weekdays, show in violet on the calendar, show as `Name (Type)` in tooltips
-- **Type taxonomy** — Office, Remote, PTO, Sick, Travel, Floating Holiday — with `s-`/`p-` prefix for confirmed/planned. PTO/Sick/Travel/Floating Holiday days are excluded from the eligible-days denominator
-- **Pre-employment days** before your start date are greyed out, not counted
-- **Mobile responsive**, accessible (WCAG AA contrast, keyboard-navigable, focus rings)
+- **In-app settings** — name, target %, start date, holiday region, work-week, custom
+  holidays, storage mode. Nothing to edit in code.
+- **Custom statuses** — rename/recolor the built-ins (Office, Remote, PTO, Sick, Travel,
+  Floating Holiday) and add your own. Each status has a **behavior** that drives the math:
+  *counts as in-office* / *eligible day (not office)* / *excluded from eligibility*. So a
+  company that counts "Client Site" as in-office can model it exactly.
+- **Click-to-cycle calendar** — click any eligible day to step through Office → Remote →
+  Plan-Office → empty (the cycle adapts to your statuses).
+- **Confirmed vs planned** — solid = it happened, dashed = upcoming intent. Past planned
+  days you didn't promote get an amber ring + a one-click "Confirm all" banner.
+- **Live compliance math** — Confirmed Rate, Projected Rate, Eligible Days, Still Needed,
+  progress bar with target marker.
+- **Flexible work-week** — pick which days count (e.g. a 4-day week).
+- **Quarterly summary** — in-office compliance by quarter from your start date to now.
+- **Portability** — JSON export/import (full backup), and `.ics` calendar export.
+- **Holiday-aware** — region preset (US/UK/CA/AU/DE/FR/None) + your custom company days are
+  excluded from eligible weekdays and shown in violet.
+- **Mobile responsive**, accessible (WCAG AA contrast, keyboard-navigable, focus rings).
 
-## Quick start
+## How holidays work
 
-### Local mode (no accounts)
+Holidays are computed **client-side** from your selected region preset (current and
+surrounding years, via a date algorithm — no lookup table to maintain) plus any **custom
+holidays** you add in Settings. There is no longer a separate `Holidays` sheet tab to
+manage; the Sheet (in either sync mode) only stores your attendance entries.
 
-1. Download `index-local.html`
-2. Open it in any text editor and edit `START_DATE`, `TARGET_PCT`, `COUNTRY`, and `CUSTOM_HOLIDAYS` if your defaults differ
-3. Open the file in a browser (double-click)
-4. Use **↓ Export .xlsx** periodically as a backup
+Adding a holiday on a weekday **reduces eligible weekdays by 1** and lowers "Still Needed"
+proportionally:
 
-### Cloud mode (Google Sheets sync)
+- `Eligible Days = work-week days in month, on/after start, minus holidays and any 'excluded' status`
+- `Still Needed  = ceil(Eligible × Target%/100) − confirmed office − planned office`
 
-1. Create a Google Sheet. The `Tracker` and `Holidays` tabs are created automatically on first sign-in
-2. Set up an OAuth Client ID in Google Cloud Console — see **[SETUP.md](SETUP.md)**
-3. Edit `SHEET_ID` and `CLIENT_ID` (and optionally `START_DATE`, `TARGET_PCT`, `COUNTRY`) at the top of `index.html`
-4. Deploy to Cloudflare Pages, GitHub Pages, or any static host
-5. Open the URL, sign in once. Edit the `Holidays` tab in Google Sheets to manage holidays going forward
+## Data shape (sync modes)
 
-## Data shape
-
-### Tracker tab (entries)
+The Sheet's `Tracker` tab (created automatically):
 
 | Col | Header | Format | Notes |
 |---|---|---|---|
-| A | Date | Real date or `YYYY-MM-DD` | Primary key |
-| B | Day | `Mon`, `Tue`, etc. | Computed by the app on every write |
-| C | Type | `s-office`, `p-office`, etc. | `s-` = confirmed, `p-` = planned. Six bases: `office`, `remote`, `pto`, `sick`, `travel`, `fhol` |
+| A | Date | `YYYY-MM-DD` (kept as text) | Primary key — upserted by date |
+| B | Day | `Mon`, `Tue`, … | Computed on write |
+| C | Type | `s-office`, `p-remote`, … | `s-` = confirmed, `p-` = planned; base is the status key |
 | D | Note | Free text | Optional |
-| E | Updated | Local-time `YYYY-MM-DD HH:MM:SS` | Audit trail |
+| E | Updated | `YYYY-MM-DD HH:MM:SS` | Audit trail |
 
-### Holidays tab (cloud) / CUSTOM_HOLIDAYS array (local)
-
-| Col | Header | Format | Notes |
-|---|---|---|---|
-| A | Date | `YYYY-MM-DD` | The date that's a holiday |
-| B | Name | Free text | Shown in tooltip and day log |
-| C | Type | One of `HOLIDAY_TYPES` | Free-form; defaults to last value if empty |
+Settings (target, holidays, statuses, work-week, etc.) live in `localStorage` on each
+device, and travel via **Export/Import JSON**.
 
 ## Tech notes
 
-- Single HTML file. No build, no bundler, no transpiler
-- Cloud version uses Google's GIS token client + Sheets v4 REST. Reads with `valueRenderOption=UNFORMATTED_VALUE` and converts serial dates back to `YYYY-MM-DD` so date round-trips are deterministic and timezone-safe
-- Optimistic UI: every mutation updates state in memory and re-renders synchronously, *then* fires the network request. On failure, state reverts and the sync indicator turns red
-- Local version uses `localStorage` for state and [SheetJS](https://cdn.jsdelivr.net/npm/xlsx@0.18.5) for `.xlsx` round-trip
-- Holiday engine: Easter via Anonymous Gregorian algorithm; nth-weekday-of-month helpers; per-country observed rules (nearest weekday for US, forward-only for UK/CA/AU, no shift for DE/FR)
-- Build stamp visible in the form-hint footer + console — easy to confirm what's actually deployed after redeploy
-- Fonts: [Inter](https://rsms.me/inter/) (UI) + [Fraunces](https://fonts.google.com/specimen/Fraunces) (display) via Google Fonts
+- Single HTML file. No build, no bundler, no transpiler.
+- **Storage adapter**: one interface (`init / loadEntries / writeRow / clearRow / ready`),
+  three implementations — `LocalStore`, `AppsScriptStore` (no-OAuth), `SheetsStore` (OAuth).
+- **No-OAuth path**: the browser POSTs (`text/plain`, to avoid a CORS preflight) to a
+  deployed Apps Script Web App, which writes the Sheet server-side under the owner's
+  identity. The Web App URL is the only credential.
+- **Status registry**: statuses + behaviors drive the compliance math; the calendar,
+  legend, dropdown, log and quick-cycle all render from it (inline colors).
+- Optimistic UI: every mutation updates state and re-renders, then fires the write; on
+  failure it reverts and the sync dot turns red.
+- Holiday engine: Easter via the Anonymous Gregorian algorithm; nth-/last-weekday helpers;
+  per-country observed-day rules.
+- Build stamp is in the "Log a Day" footer + console — confirm what's deployed.
+- Fonts: [Inter](https://rsms.me/inter/) + [Fraunces](https://fonts.google.com/specimen/Fraunces).
+
+## Quick start
+
+See **[INSTRUCTIONS.md](INSTRUCTIONS.md)**. Short version: open `index.html`, complete the
+Welcome screen, pick **This device** to start instantly — or **Google Sheet (No OAuth)** and
+follow the Apps Script steps to sync.
 
 ## Browser support
 
-Recent Chrome, Safari, Firefox, Edge. Uses `aspect-ratio`, optional chaining. Should work in any browser from 2022 onward.
-
-## Contributing
-
-PRs welcome. The codebase is small (~50 KB per file, vanilla HTML/CSS/JS) and intentionally has no build step. If you fork this for your own org and want to upstream improvements, open an issue first to align on direction.
+Recent Chrome, Safari, Firefox, Edge. Uses `aspect-ratio`, optional chaining, `fetch`.
 
 ## License
 
