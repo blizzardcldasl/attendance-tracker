@@ -1,5 +1,11 @@
 # Setup Guide
 
+> ⚠️ **This is the advanced OAuth path, kept for reference.** The app is now one unified,
+> settings-driven file — most people should start with **[INSTRUCTIONS.md](INSTRUCTIONS.md)**
+> and use the **no-OAuth Google Sheet** mode (a small Apps Script Web App — no Google Cloud
+> project, no OAuth consent screen). Only follow this guide if you specifically want the
+> direct Sheets-API OAuth backend. Details below describe the older two-file model.
+
 A single-file static web app for tracking hybrid office attendance against a configurable monthly target. Pick a flavor:
 
 | Flavor | File | Storage | Setup time | Best for |

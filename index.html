@@ -41,6 +41,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .hdr-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .pill-link{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--travel);background:var(--travel-bg);border:1px solid rgba(30,64,175,.2);border-radius:999px;padding:6px 11px;text-decoration:none;letter-spacing:.2px;transition:transform .15s,box-shadow .15s;}
 .pill-link:hover{transform:translateY(-1px);box-shadow:var(--sh-1);}
+.pill-link.hide{display:none;}
 .sync{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;box-shadow:var(--sh-1);}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:background .25s;flex-shrink:0;}
 .sync-dot.ok{background:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,.18);}
@@ -48,6 +49,8 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .sync-dot.busy{background:#f59e0b;animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
 .start-pill{font-size:11px;font-weight:700;color:var(--teal-dk);background:var(--teal-tint);border:1px solid rgba(13,122,92,.25);border-radius:999px;padding:6px 12px;letter-spacing:.4px;text-transform:uppercase;}
+.icon-btn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-1);transition:all .15s;color:var(--text2);font-size:15px;line-height:1;}
+.icon-btn:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-1px) rotate(30deg);}
 
 .auth-banner{display:none;background:#FFFBEB;border:1.5px solid #F59E0B;border-radius:var(--r);padding:14px 16px;margin-bottom:20px;font-size:12px;line-height:1.7;}
 .auth-banner.show{display:block;}
@@ -192,6 +195,58 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .btn-x:hover{background:var(--sick-bg);color:var(--sick);}
 .no-log{padding:28px 16px;text-align:center;color:var(--muted2);font-size:12.5px;font-style:italic;}
 
+/* ---------- enhancements: modal / settings / onboarding ---------- */
+.modal-overlay{position:fixed;inset:0;z-index:50;background:rgba(27,26,23,.45);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:520px;box-shadow:0 24px 60px -14px rgba(28,25,23,.42);animation:pop .2s cubic-bezier(.4,0,.2,1);}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.985);}to{opacity:1;transform:none;}}
+.modal-h{padding:20px 22px 14px;border-bottom:1px solid var(--hairline);}
+.modal-h h2{font-family:'Fraunces',serif;font-weight:900;font-size:24px;letter-spacing:-.6px;font-variation-settings:"opsz" 144;}
+.modal-h p{font-size:12.5px;color:var(--muted2);margin-top:4px;line-height:1.55;}
+.modal-body{padding:18px 22px;display:flex;flex-direction:column;gap:15px;max-height:62vh;overflow-y:auto;}
+.modal-foot{padding:14px 22px 18px;border-top:1px solid var(--hairline);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;align-items:center;}
+.modal-foot .spacer{margin-right:auto;}
+.fld{display:flex;flex-direction:column;gap:5px;}
+.fld>label{font-size:9.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted2);}
+.fld input,.fld select{width:100%;padding:10px 11px;background:#FAF8F4;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:inherit;font-size:13px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s,background .15s;}
+.fld input:focus,.fld select:focus{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px var(--teal-lt);}
+.fld .hint{font-size:11px;color:var(--muted2);line-height:1.5;}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.sect-lbl{font-size:9.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--teal-dk);border-top:1px solid var(--hairline);margin-top:2px;padding-top:14px;}
+.sect-lbl:first-child{border-top:none;margin-top:0;padding-top:0;}
+.seg{display:flex;gap:6px;flex-wrap:wrap;}
+.seg button{flex:1;min-width:90px;padding:9px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:#FAF8F4;font-size:12px;font-weight:600;color:var(--text2);transition:all .15s;}
+.seg button.on{border-color:var(--teal);background:var(--teal-lt);color:var(--teal-dk);}
+.wk{display:flex;gap:5px;}
+.wk button{flex:1;padding:8px 0;border:1.5px solid var(--border);border-radius:var(--r-sm);background:#FAF8F4;font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;transition:all .15s;}
+.wk button.on{border-color:var(--teal);background:var(--teal-lt);color:var(--teal-dk);}
+.chips{display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto;}
+.chip{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#FAF8F4;border:1px solid var(--border);border-radius:var(--r-sm);font-size:12px;}
+.chip .cd2{font-variant-numeric:tabular-nums;font-weight:700;color:var(--text);min-width:82px;}
+.chip .cn{flex:1;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chip .cx{width:20px;height:20px;border-radius:4px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chip .cx:hover{background:var(--sick-bg);color:var(--sick);}
+.chips-empty{font-size:11.5px;color:var(--muted2);font-style:italic;padding:4px 2px;}
+.add-hol{display:grid;grid-template-columns:1.1fr 1.4fr auto;gap:6px;align-items:center;}
+.add-hol input{padding:8px 9px;font-size:12px;background:#FAF8F4;border:1.5px solid var(--border);border-radius:var(--r-sm);outline:none;}
+.add-hol input:focus{border-color:var(--teal);background:#fff;}
+.btn-add{padding:9px 12px;background:var(--teal);color:#fff;border-radius:var(--r-sm);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;}
+.btn-add:hover{background:var(--teal-dk);}
+.btn-primary{padding:11px 20px;background:var(--text);color:#fff;border-radius:var(--r-sm);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;transition:all .15s;}
+.btn-primary:hover{background:var(--teal-dk);}
+.btn-ghost{padding:11px 18px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal);}
+.choice{display:flex;flex-direction:column;gap:10px;}
+.choice>button{text-align:left;padding:15px 16px;border:1.5px solid var(--border);border-radius:var(--r);background:#FAF8F4;transition:all .15s;}
+.choice>button:hover{border-color:var(--teal);background:var(--teal-lt);transform:translateY(-1px);}
+.choice .ct{font-weight:700;font-size:14px;color:var(--text);margin-bottom:3px;display:flex;align-items:center;gap:8px;}
+.choice .cdesc{font-size:12px;color:var(--muted2);line-height:1.5;}
+.choice .ctag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 7px;border-radius:999px;background:var(--teal-tint);color:var(--teal-dk);margin-left:auto;}
+.choice>button.sel{border-color:var(--teal);background:var(--teal-lt);box-shadow:0 0 0 2px var(--teal-lt);}
+.choice>button.sel .ct::after{content:"✓";margin-left:6px;color:var(--teal-dk);font-weight:900;}
+.sheets-only{display:none;flex-direction:column;gap:15px;}
+.sheets-only.show{display:flex;}
+
 @media(max-width:980px){
   .main-grid{grid-template-columns:1fr;}
   .stats-grid{grid-template-columns:repeat(2,1fr);}
@@ -210,6 +265,8 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
   .cd .dn{font-size:13px;}
   .ln{display:none;}
   .nav-btn{width:40px;height:40px;}
+  .fld-row{grid-template-columns:1fr;}
+  .add-hol{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -218,13 +275,15 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 
   <header class="hdr">
     <div class="brand">
-      <div class="brand-eyebrow">Hybrid Office Compliance</div>
+      <div class="brand-eyebrow" id="brandEyebrow">Hybrid Office Compliance</div>
       <h1>Attendance <em>Tracker</em></h1>
     </div>
     <div class="hdr-meta">
-      <a class="pill-link" id="sheetLink" href="#" target="_blank" rel="noopener">&#9741; Google Sheet</a>
-      <div class="sync"><div class="sync-dot" id="syncDot"></div><span id="syncLabel" aria-live="polite">Connecting&hellip;</span></div>
+      <a class="pill-link hide" id="sheetLink" href="#" target="_blank" rel="noopener">&#9741; Google Sheet</a>
+      <div class="sync"><div class="sync-dot" id="syncDot"></div><span id="syncLabel" aria-live="polite">Starting&hellip;</span></div>
       <span class="start-pill" id="startPill">Start &middot; &mdash;</span>
+      <button class="icon-btn" id="btnRollup" type="button" title="Quarterly summary" aria-label="Quarterly summary">&#9776;</button>
+      <button class="icon-btn" id="btnSettings" type="button" title="Settings" aria-label="Settings">&#9881;</button>
     </div>
   </header>
 
@@ -275,20 +334,9 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 
   <div class="main-grid">
     <div class="left-col">
-      <div class="legend">
-        <div class="li"><div class="ls" style="background:var(--office-bg);border:1.5px solid rgba(22,101,52,.5)"></div>In Office</div>
-        <div class="li"><div class="ls" style="background:var(--remote-bg);border:1.5px solid rgba(68,64,60,.4)"></div>Remote</div>
-        <div class="li"><div class="ls" style="background:var(--pto-bg);border:1.5px solid rgba(146,64,14,.45)"></div>PTO</div>
-        <div class="li"><div class="ls" style="background:var(--sick-bg);border:1.5px solid rgba(159,18,57,.45)"></div>Sick</div>
-        <div class="li"><div class="ls" style="background:var(--travel-bg);border:1.5px solid rgba(30,64,175,.45)"></div>Travel</div>
-        <div class="li"><div class="ls" style="background:var(--hol-bg);border:1.5px solid rgba(91,33,182,.45)"></div>Holiday</div>
-        <div class="li"><div class="ls" style="background:#F5F4F0;border:2px dashed #9CA3AF"></div>= Planned</div>
-      </div>
+      <div class="legend" id="legend"></div>
       <div class="cal-card">
-        <div class="cal-wdays">
-          <div class="cal-wday">Sun</div><div class="cal-wday">Mon</div><div class="cal-wday">Tue</div>
-          <div class="cal-wday">Wed</div><div class="cal-wday">Thu</div><div class="cal-wday">Fri</div><div class="cal-wday">Sat</div>
-        </div>
+        <div class="cal-wdays" id="calWdays"></div>
         <div class="cal-grid" id="calGrid"></div>
       </div>
     </div>
@@ -321,7 +369,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
         <div class="form-hint">
           <strong>Confirmed</strong> = it happened (badge/WiFi verified).<br>
           <strong>Planned</strong> = upcoming intent, not yet counted.<br>
-          Click any calendar day to quick-cycle status. Manage holidays in the <code>Holidays</code> tab of your sheet.
+          Click any calendar day to quick-cycle status. Manage holidays &amp; targets in <strong>Settings</strong> (&#9881;).
           <span class="build-stamp">build <span id="buildStamp">&mdash;</span></span>
         </div>
       </div>
@@ -334,64 +382,127 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 
 </div>
 
+<!-- Generic modal: populated by JS for onboarding & settings -->
+<div class="modal-overlay" id="modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-h"><h2 id="modalTitle"></h2><p id="modalSub"></p></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 "use strict";
 
 // ===========================================================================
-// CONFIGURATION — Edit these values, save, deploy. Done.
-// ===========================================================================
-const SHEET_ID    = '';                  // /spreadsheets/d/[THIS]/edit
-const SHEET_TAB   = 'Tracker';           // attendance log tab name
-const HOLIDAY_TAB = 'Holidays';          // holidays tab name
-const CLIENT_ID   = '';                  // OAuth Client ID — see SETUP.md
-const START_DATE  = '2026-01-01';        // YYYY-MM-DD; days before are excluded
-const TARGET_PCT  = 60;                  // % of eligible weekdays in office
-const COUNTRY     = 'US';                // initial Holidays tab seed only
-
-// Holiday Type column — categories used when seeding the Holidays tab and
-// shown in tooltips/log. Add/remove/rename freely; the app doesn't enforce
-// the list. The first value is what country-preset rows are tagged as
-// (when the date isn't observed-shifted); the last is the fallback when
-// the Type cell is empty.
-//
-// Common regional alternatives (rename above to suit your context):
-//   'Public'   — Federal (US), Bank Holiday (UK/IE), Statutory (CA/NZ),
-//                National, Public Holiday
-//   'Regional' — State, Provincial, Local
-//   'Observed' — Substituted, Day in Lieu, Shifted
-//   'Company'  — Floating, Office Closure, Discretionary
-const HOLIDAY_TYPES = ['Public', 'Regional', 'Observed', 'Company'];
-
-// Optional: extra holidays included in the initial Holidays tab seed.
-// After seeding, edit the Holidays tab directly for additions/removals.
-const SEED_CUSTOM_HOLIDAYS = [
-  // {date: '2026-12-31', name: 'Year-end closure', type: 'Company'},
-];
-// ===========================================================================
-// END OF CONFIGURATION — do not edit below this line.
+// Hybrid Attendance Tracker — unified build.
+// One file, two storage backends (local-first or Google Sheets); all user
+// settings live in-app (no code editing). See enhancements/README.md.
 // ===========================================================================
 
+const APP_BUILD = '2026-06-09-e5';
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
-const APP_BUILD = '2026-04-30-i';
+const LS_SETTINGS = 'az-tracker-settings-v1';
+const LS_ENTRIES  = 'az-tracker-entries-v1';
+
+// Defaults for a brand-new user. Everything here is overridable in Settings.
+const DEFAULTS = {
+  name: '',
+  storageMode: 'local',          // 'local' | 'appsscript' | 'sheets'
+  targetPct: 60,                 // % of eligible workdays required in office
+  startDate: '2026-01-01',       // days before this are excluded
+  country: 'US',                 // holiday preset
+  workdays: [1,2,3,4,5],         // 0=Sun … 6=Sat
+  customHolidays: [],            // [{date:'YYYY-MM-DD', name, type}]
+  scriptUrl: '',                 // appsscript mode — deployed Web App URL
+  scriptToken: '',               // appsscript mode — optional shared secret
+  sheetId: '',                   // sheets mode (OAuth) only
+  clientId: '',                  // sheets mode (OAuth) only — OAuth client id
+};
 
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const COUNTRY_NAMES = {US:'United States',UK:'United Kingdom',CA:'Canada',AU:'Australia',DE:'Germany',FR:'France',NONE:'None / custom only'};
 const _now = new Date();
 const CAL_END_Y = _now.getFullYear() + 2;
 const CAL_END_M = _now.getMonth();
-
 const pad2 = n => String(n).padStart(2,'0');
 
-// Derive START from START_DATE
-let START = (() => {
-  const p = (START_DATE || '2026-01-01').split('-').map(Number);
-  return {y: p[0] || 2026, m: (p[1] || 1) - 1, d: p[2] || 1};
-})();
+// =============================================================
+// STATUS REGISTRY — built-ins + user-defined. The `behavior` drives the math:
+//   'office'   → counts as an in-office day
+//   'eligible' → counts as a normal eligible day, not office (e.g. Remote)
+//   'excluded' → removed from eligibility entirely (e.g. PTO / Sick)
+// Renaming/recoloring/changing behavior re-scores history live (entries keep
+// their status key). Built-ins can be edited but not removed.
+// =============================================================
+const DEFAULT_STATUSES = [
+  {key:'office', label:'In Office',        color:'#166534', behavior:'office',   tag:'OFF'},
+  {key:'remote', label:'Remote',           color:'#57534E', behavior:'eligible', tag:'RMT'},
+  {key:'pto',    label:'PTO',              color:'#92400E', behavior:'excluded', tag:'PTO'},
+  {key:'sick',   label:'Sick',             color:'#9F1239', behavior:'excluded', tag:'SICK'},
+  {key:'travel', label:'Travel',           color:'#1E40AF', behavior:'excluded', tag:'TRVL'},
+  {key:'fhol',   label:'Floating Holiday', color:'#5B21B6', behavior:'excluded', tag:'FHL'},
+];
+const BUILTIN_KEYS = new Set(DEFAULT_STATUSES.map(s => s.key));
+const STATUS_BEHAVIORS = [
+  {v:'office',   t:'Counts as in-office'},
+  {v:'eligible', t:'Eligible day (not office)'},
+  {v:'excluded', t:'Excluded from eligibility'},
+];
+let STATUS_BY_KEY = {};
+function statusList(){ return (settings && settings.statuses) || DEFAULT_STATUSES; }
+function buildStatusIndex(){ STATUS_BY_KEY = {}; statusList().forEach(s => { STATUS_BY_KEY[s.key] = s; }); }
+function statusOf(base){ return STATUS_BY_KEY[base] || null; }
+function statusLabel(base){ return statusOf(base)?.label || base || 'Logged'; }
+function statusColor(base){ return statusOf(base)?.color || '#57534E'; }
+function behaviorOf(base){ return statusOf(base)?.behavior || 'eligible'; }
+function statusTag(base){
+  const s = statusOf(base);
+  if (s?.tag) return s.tag;
+  return (s?.label || base || '').replace(/[^A-Za-z0-9]/g,'').slice(0,4).toUpperCase() || '•';
+}
+function ensureDefaults(s){
+  if (!Array.isArray(s.statuses) || !s.statuses.length) s.statuses = DEFAULT_STATUSES.map(x => ({...x}));
+  return s;
+}
+function uniqueStatusKey(prefix, list){
+  const used = new Set(list.map(s => s.key));
+  let i = 1, k;
+  do { k = prefix + i; i++; } while (used.has(k));
+  return k;
+}
+function hexToRgba(hex, a){
+  let h = String(hex || '#57534E').replace('#','');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const n = parseInt(h, 16);
+  if (isNaN(n)) return `rgba(87,83,78,${a})`;
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
 
 // =============================================================
-// HOLIDAY COMPUTATION ENGINE — used only to seed the Holidays tab
-// on first sign-in. After seeding, the sheet is the source of truth.
+// SETTINGS
+// =============================================================
+let settings = null;
+let START = {y:2026, m:0, d:1};
+
+function loadSettings(){
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_SETTINGS) || 'null');
+    if (s && typeof s === 'object') return ensureDefaults({...DEFAULTS, ...s});
+  } catch(e){ console.warn('[settings] load failed', e); }
+  return null;
+}
+function saveSettings(){ localStorage.setItem(LS_SETTINGS, JSON.stringify(settings)); }
+function applySettings(){
+  const p = (settings.startDate || '2026-01-01').split('-').map(Number);
+  START = {y: p[0] || 2026, m: (p[1] || 1) - 1, d: p[2] || 1};
+}
+
+// =============================================================
+// HOLIDAY COMPUTATION ENGINE — country presets + custom holidays.
+// Pure client-side; no sheet tab required.
 // =============================================================
 function _ymd(y,m,d){ return `${y}-${pad2(m)}-${pad2(d)}`; }
 function easterSunday(y){
@@ -504,24 +615,30 @@ const COUNTRY_RULES = {
   ],
   NONE: () => [],
 };
-function computeCountryHolidays(year){
-  const fn = COUNTRY_RULES[(COUNTRY || 'US').toUpperCase()] || COUNTRY_RULES.US;
-  const yp = String(year) + '-';
-  const out = [];
-  for (const yr of [year, year + 1]){
+
+// Build HOLIDAYS_MAP from the selected country preset across the visible
+// year range, then overlay user custom holidays (which always win).
+function buildHolidays(){
+  const map = {};
+  const fn = COUNTRY_RULES[(settings.country || 'US').toUpperCase()] || COUNTRY_RULES.NONE;
+  for (let yr = START.y - 1; yr <= CAL_END_Y + 1; yr++){
     for (const h of fn(yr)){
-      if (h.key && h.key.startsWith(yp)) out.push(h);
+      if (h.key) map[h.key] = {name: h.name, type: h.observed ? 'Observed' : 'Public'};
     }
   }
-  return out;
+  for (const h of (settings.customHolidays || [])){
+    if (h && /^\d{4}-\d{2}-\d{2}$/.test(h.date)){
+      map[h.date] = {name: h.name || 'Holiday', type: h.type || 'Company'};
+    }
+  }
+  HOLIDAYS_MAP = map;
 }
 
 // =============================================================
 // STATE
 // =============================================================
-let token = null;
-let entries = {};         // {dateKey: {type, note, row}}
-let HOLIDAYS_MAP = {};    // {dateKey: {name, type}} — read from Holidays tab
+let entries = {};         // {dateKey: {type, note, row?}}
+let HOLIDAYS_MAP = {};    // {dateKey: {name, type}}
 let busy = false;
 let viewY = _now.getFullYear();
 let viewM = _now.getMonth();
@@ -532,7 +649,7 @@ let viewM = _now.getMonth();
 const key = (y,m,d) => `${y}-${pad2(m+1)}-${pad2(d)}`;
 const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return {y, m:m-1, d}; };
 const today = () => { const n = new Date(); return {y:n.getFullYear(), m:n.getMonth(), d:n.getDate()}; };
-const isWknd = (y,m,d) => { const w = new Date(y,m,d).getDay(); return w === 0 || w === 6; };
+const isWorkday = (y,m,d) => settings.workdays.includes(new Date(y,m,d).getDay());
 const isPre = (y,m,d) =>
   y < START.y ||
   (y === START.y && m < START.m) ||
@@ -543,8 +660,8 @@ const holidayType = k => HOLIDAYS_MAP[k]?.type || null;
 const isConf = t => !!t && t.startsWith('s-');
 const isPlan = t => !!t && t.startsWith('p-');
 const baseT = t => t ? t.replace(/^[sp]-/, '') : null;
-const isExcl = (type, k) => isHol(k) || ['pto','sick','travel','fhol'].includes(baseT(type));
-const isOff = t => baseT(t) === 'office';
+const isExcl = (type, k) => isHol(k) || behaviorOf(baseT(type)) === 'excluded';
+const isOff = t => behaviorOf(baseT(t)) === 'office';
 
 function serialToYMD(serial){
   const ms = Date.UTC(1899, 11, 30) + serial * 86400000;
@@ -574,212 +691,247 @@ function normalizeType(raw){
   if (!t.startsWith('s-') && !t.startsWith('p-')) t = 's-' + t;
   return t;
 }
-function localTimestamp(){
+function fullTimestamp(){
   const d = new Date();
   return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
 }
 
 // =============================================================
-// STATS — holidays come from HOLIDAYS_MAP via isHol() → isExcl()
-// Adding a row to the Holidays tab reduces eligible days and "still needed".
+// STATS
 // =============================================================
-function calcStats(y,m){
+const newAcc = () => ({elig:0, pastElig:0, futureEl:0, cOff:0, pOff:0, excl:0});
+function accumStats(acc, y, m){
   const t = today();
   const dim = new Date(y, m+1, 0).getDate();
-  let elig = 0, pastElig = 0, futureEl = 0, cOff = 0, pOff = 0, excl = 0;
   for (let d = 1; d <= dim; d++){
-    if (isWknd(y,m,d) || isPre(y,m,d)) continue;
+    if (!isWorkday(y,m,d) || isPre(y,m,d)) continue;
     const k = key(y,m,d);
-    const ent = entries[k];
-    const type = ent?.type;
-    if (isExcl(type, k)){ excl++; continue; }
-    elig++;
+    const type = entries[k]?.type;
+    if (isExcl(type, k)){ acc.excl++; continue; }
+    acc.elig++;
     const past = (y < t.y) || (y === t.y && m < t.m) || (y === t.y && m === t.m && d <= t.d);
     if (past){
-      pastElig++;
-      if (isConf(type) && isOff(type)) cOff++;
+      acc.pastElig++;
+      if (isConf(type) && isOff(type)) acc.cOff++;
     } else {
-      futureEl++;
-      if (isPlan(type) && isOff(type)) pOff++;
+      acc.futureEl++;
+      if (isPlan(type) && isOff(type)) acc.pOff++;
     }
   }
-  const cr = pastElig > 0 ? Math.round(cOff / pastElig * 100) : 0;
-  const pr = elig > 0 ? Math.round((cOff + pOff) / elig * 100) : 0;
-  const need = Math.max(0, Math.ceil(elig * TARGET_PCT / 100) - cOff - pOff);
-  return {elig, pastElig, futureEl, cOff, pOff, excl, cr, pr, need};
+  return acc;
+}
+function finalizeStats(acc){
+  const TARGET = settings.targetPct;
+  const cr = acc.pastElig > 0 ? Math.round(acc.cOff / acc.pastElig * 100) : 0;
+  const pr = acc.elig > 0 ? Math.round((acc.cOff + acc.pOff) / acc.elig * 100) : 0;
+  const need = Math.max(0, Math.ceil(acc.elig * TARGET / 100) - acc.cOff - acc.pOff);
+  return {...acc, cr, pr, need};
+}
+function calcStats(y,m){ return finalizeStats(accumStats(newAcc(), y, m)); }
+function calcRange(y0,m0,y1,m1){
+  const acc = newAcc();
+  let y = y0, m = m0;
+  while (y < y1 || (y === y1 && m <= m1)){
+    accumStats(acc, y, m);
+    if (++m > 11){ m = 0; y++; }
+  }
+  return finalizeStats(acc);
 }
 
 // =============================================================
-// SHEETS API
+// STORAGE ADAPTERS — one interface, two implementations.
+//   init()        establish connection (local: instant; sheets: OAuth)
+//   loadEntries() populate `entries`
+//   writeRow(k,type,note,row?) -> newRow|null
+//   clearRow(k,row?)
+//   .ready        whether writes can proceed
 // =============================================================
 const enc = encodeURIComponent;
-async function shReq(method, path, body){
-  const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}${path}`, {
-    method,
-    headers: {Authorization:`Bearer ${token}`, 'Content-Type':'application/json'},
-    body: body ? JSON.stringify(body) : undefined
-  });
-  if (!r.ok) throw new Error(await r.text());
-  return r.json();
-}
 
-async function loadEntries(){
-  const hdr = await shReq('GET',
-    `/values/${enc(SHEET_TAB + '!A1:E1')}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`);
-  if (!hdr.values?.[0]?.[0]){
-    await shReq('PUT',
-      `/values/${enc(SHEET_TAB + '!A1:E1')}?valueInputOption=USER_ENTERED`,
-      {values:[['Date','Day','Type','Note','Updated']]});
-  }
-  const data = await shReq('GET',
-    `/values/${enc(SHEET_TAB + '!A2:E')}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`);
-  const next = {};
-  (data.values || []).forEach((row, i) => {
-    const dateKey = normalizeDateCell(row[0]);
-    const type = normalizeType(row[2]);
-    if (!dateKey || !type) return;
-    next[dateKey] = {type, note: row[3] != null ? String(row[3]) : '', row: i + 2};
-  });
-  entries = next;
-}
-
-let _holidaysTabExists = null;
-
-async function ensureHolidaysTab(){
-  if (_holidaysTabExists === true) return false;
-  const meta = await shReq('GET', '?fields=sheets.properties.title');
-  const tabs = (meta?.sheets || []).map(s => s.properties?.title || '');
-  if (tabs.includes(HOLIDAY_TAB)){
-    _holidaysTabExists = true;
-    return false;
-  }
-  await shReq('POST', ':batchUpdate', {
-    requests: [{addSheet: {properties: {title: HOLIDAY_TAB}}}]
-  });
-  await shReq('PUT',
-    `/values/${enc(HOLIDAY_TAB + '!A1:C1')}?valueInputOption=USER_ENTERED`,
-    {values: [['Date', 'Name', 'Type']]});
-  _holidaysTabExists = true;
-  return true; // newly created — caller should seed
-}
-
-async function seedHolidaysTab(){
-  const currentYear = _now.getFullYear();
-  const rows = [];
-  // Country preset for current and next calendar year
-  for (const year of [currentYear, currentYear + 1]){
-    for (const h of computeCountryHolidays(year)){
-      const t = h.observed ? 'Observed' : (HOLIDAY_TYPES[0] || 'Public');
-      rows.push([h.key, h.name, t]);
+const LocalStore = {
+  mode: 'local',
+  ready: true,
+  init(){ afterConnect(); },
+  async loadEntries(){
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(LS_ENTRIES) || '{}'); } catch(e){}
+    const next = {};
+    for (const [k, v] of Object.entries(saved)){
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+      const type = normalizeType(v.type);
+      if (!type) continue;
+      next[k] = {type, note: v.note || ''};
     }
-  }
-  // Plus any seed-time custom additions
-  const fallbackType = HOLIDAY_TYPES[HOLIDAY_TYPES.length - 1] || 'Custom';
-  for (const h of (SEED_CUSTOM_HOLIDAYS || [])){
-    if (h?.date && /^\d{4}-\d{2}-\d{2}$/.test(h.date)){
-      rows.push([h.date, h.name || 'Custom Holiday', h.type || fallbackType]);
-    }
-  }
-  rows.sort((a,b) => a[0].localeCompare(b[0]));
-  if (!rows.length) return;
-  await shReq('PUT',
-    `/values/${enc(HOLIDAY_TAB + '!A2')}?valueInputOption=USER_ENTERED`,
-    {values: rows});
-}
+    entries = next;
+  },
+  _persist(){
+    const out = {};
+    for (const [k, v] of Object.entries(entries)){ out[k] = {type: v.type, note: v.note || ''}; }
+    try { localStorage.setItem(LS_ENTRIES, JSON.stringify(out)); }
+    catch(e){ console.warn('[local] save failed', e); }
+  },
+  async writeRow(k, type, note){ entries[k] = {type, note}; this._persist(); return null; },
+  async clearRow(k){ delete entries[k]; this._persist(); },
+};
 
-async function loadHolidaysFromSheet(){
-  try {
-    const r = await shReq('GET',
-      `/values/${enc(HOLIDAY_TAB + '!A2:C')}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`);
-    const map = {};
-    const fallbackType = HOLIDAY_TYPES[HOLIDAY_TYPES.length - 1] || 'Custom';
-    for (const row of (r.values || [])){
+const SheetsStore = {
+  mode: 'sheets',
+  ready: false,
+  token: null,
+  tab: 'Tracker',
+  init(){
+    if (!settings.clientId || !settings.sheetId){
+      showBanner('<strong>Google Sheet not configured.</strong> Add your Sheet ID and OAuth Client ID in <strong>Settings</strong> (&#9881;), or switch to Local mode.');
+      setSync('err','Setup needed');
+      return;
+    }
+    try {
+      google.accounts.oauth2.initTokenClient({
+        client_id: settings.clientId, scope: SCOPE, prompt: '',
+        callback: r => {
+          if (r.error){ setSync('err','Sign in needed'); showSignIn(); return; }
+          this.token = r.access_token; this.ready = true; hideBanner(); afterConnect();
+        }
+      }).requestAccessToken({prompt: ''});
+    } catch(e){ console.error(e); setSync('err','Auth unavailable'); render(); }
+  },
+  async _req(method, path, body){
+    const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${settings.sheetId}${path}`, {
+      method,
+      headers: {Authorization:`Bearer ${this.token}`, 'Content-Type':'application/json'},
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  },
+  async loadEntries(){
+    const hdr = await this._req('GET',
+      `/values/${enc(this.tab + '!A1:E1')}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`);
+    if (!hdr.values?.[0]?.[0]){
+      await this._req('PUT',
+        `/values/${enc(this.tab + '!A1:E1')}?valueInputOption=USER_ENTERED`,
+        {values:[['Date','Day','Type','Note','Updated']]});
+    }
+    const data = await this._req('GET',
+      `/values/${enc(this.tab + '!A2:E')}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`);
+    const next = {};
+    (data.values || []).forEach((row, i) => {
       const dateKey = normalizeDateCell(row[0]);
-      if (!dateKey) continue;
-      const name = (row[1] != null ? String(row[1]) : 'Holiday').trim() || 'Holiday';
-      const type = (row[2] != null ? String(row[2]) : '').trim() || fallbackType;
-      map[dateKey] = {name, type};
+      const type = normalizeType(row[2]);
+      if (!dateKey || !type) return;
+      next[dateKey] = {type, note: row[3] != null ? String(row[3]) : '', row: i + 2};
+    });
+    entries = next;
+  },
+  async writeRow(k, type, note, existingRow){
+    const {y, m, d} = parseKey(k);
+    const dayName = DAYS[new Date(y,m,d).getDay()];
+    const ts = fullTimestamp();
+    if (existingRow){
+      await this._req('PUT',
+        `/values/${enc(this.tab + '!A' + existingRow + ':E' + existingRow)}?valueInputOption=USER_ENTERED`,
+        {values: [[k, dayName, type, note, ts]]});
+      return existingRow;
     }
-    HOLIDAYS_MAP = map;
-  } catch (e){
-    console.warn('[Holidays] read failed', e);
-    HOLIDAYS_MAP = {};
-  }
-}
-
-function parseAppendedRow(updatedRange){
-  if (!updatedRange) return null;
-  const m = updatedRange.match(/!A(\d+):/);
-  return m ? parseInt(m[1], 10) : null;
-}
-
-async function writeRow(k, type, note, existingRow){
-  const {y, m, d} = parseKey(k);
-  const dayName = DAYS[new Date(y,m,d).getDay()];
-  const ts = localTimestamp();
-  if (existingRow){
-    await shReq('PUT',
-      `/values/${enc(SHEET_TAB + '!A' + existingRow + ':E' + existingRow)}?valueInputOption=USER_ENTERED`,
+    const res = await this._req('POST',
+      `/values/${enc(this.tab)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
       {values: [[k, dayName, type, note, ts]]});
-    return existingRow;
-  }
-  const res = await shReq('POST',
-    `/values/${enc(SHEET_TAB)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
-    {values: [[k, dayName, type, note, ts]]});
-  return parseAppendedRow(res?.updates?.updatedRange);
-}
+    const mr = res?.updates?.updatedRange?.match(/!A(\d+):/);
+    return mr ? parseInt(mr[1], 10) : null;
+  },
+  async clearRow(k, row){
+    if (row){ await this._req('POST', `/values/${enc(this.tab + '!A' + row + ':E' + row)}:clear`, null); }
+  },
+};
 
-async function clearRow(row){
-  await shReq('POST', `/values/${enc(SHEET_TAB + '!A' + row + ':E' + row)}:clear`, null);
-}
+// Google Sheets via an Apps Script Web App — NO OAuth, no Google Cloud project.
+// The browser POSTs to one deployed URL; the script writes to the sheet
+// server-side under the owner's identity. text/plain avoids a CORS preflight.
+const AppsScriptStore = {
+  mode: 'appsscript',
+  ready: false,
+  async _call(payload){
+    if (!settings.scriptUrl) throw new Error('No Web App URL set');
+    const r = await fetch(settings.scriptUrl, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({...payload, token: settings.scriptToken || ''}),
+      redirect: 'follow',
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'Script error');
+    return data;
+  },
+  init(){
+    if (!settings.scriptUrl){
+      showBanner('<strong>Web App URL missing.</strong> Paste your Apps Script Web App URL in <strong>Settings</strong> (&#9881;), or switch to Local mode.');
+      setSync('err','Setup needed');
+      return;
+    }
+    this.ready = true;
+    afterConnect();
+  },
+  async loadEntries(){
+    const data = await this._call({action: 'load'});
+    const next = {};
+    (data.values || []).forEach(row => {
+      const dateKey = normalizeDateCell(row[0]);   // 'Date' header → null, skipped
+      const type = normalizeType(row[2]);
+      if (!dateKey || !type) return;
+      next[dateKey] = {type, note: row[3] != null ? String(row[3]) : ''};
+    });
+    entries = next;
+  },
+  async writeRow(k, type, note){
+    const {y, m, d} = parseKey(k);
+    const dayName = DAYS[new Date(y,m,d).getDay()];
+    await this._call({action: 'upsert', row: [k, dayName, type, note, fullTimestamp()]});
+    return null;   // server upserts by date — no row tracking needed
+  },
+  async clearRow(k){
+    await this._call({action: 'delete', date: k});
+  },
+};
 
-async function syncOnSignIn(){
-  setSync('busy', 'Syncing…');
-  try {
-    await loadEntries();
-    const newlyCreated = await ensureHolidaysTab();
-    if (newlyCreated){ await seedHolidaysTab(); }
-    await loadHolidaysFromSheet();
-    setSync('ok', 'Synced ✓');
-    render();
-  } catch (e){
-    console.error('[sync]', e);
-    setSync('err', 'Sync error');
-    render();
-  }
-}
+let Store = LocalStore;
 
-// =============================================================
-// AUTH
-// =============================================================
-function initAuth(){
+async function setupStore(){
+  Store = settings.storageMode === 'sheets' ? SheetsStore
+        : settings.storageMode === 'appsscript' ? AppsScriptStore
+        : LocalStore;
+  applySettings();
+  buildStatusIndex();
+  buildHolidays();
+  syncHeaderChrome();
+  setSync('busy', 'Starting…');
   render();
-  if (!CLIENT_ID || !SHEET_ID){
-    showBanner('<strong>Setup needed.</strong> Edit <code>SHEET_ID</code> and <code>CLIENT_ID</code> at the top of <code>index.html</code> and redeploy. See <code>SETUP.md</code>.');
-    setSync('err','Setup needed');
-    return;
-  }
-  try {
-    google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID, scope: SCOPE, prompt: '',
-      callback: r => {
-        if (r.error){ setSync('err','Sign in needed'); showSignIn(); return; }
-        token = r.access_token;
-        hideBanner();
-        syncOnSignIn();
-      }
-    }).requestAccessToken({prompt: ''});
-  } catch (e){ console.error(e); setSync('err','Auth unavailable'); render(); }
+  Store.init();
 }
-function showBanner(html){ const b = g('authBanner'); b.className = 'auth-banner show'; b.innerHTML = html; }
-function hideBanner(){ g('authBanner').className = 'auth-banner'; }
+
+async function afterConnect(){
+  try {
+    await Store.loadEntries();
+    setSync('ok', Store.mode === 'local' ? 'Local ✓' : 'Synced ✓');
+  } catch(e){
+    console.error('[load]', e);
+    setSync('err', 'Load failed');
+  }
+  render();
+}
+
+// =============================================================
+// AUTH banner helpers (sheets mode only)
+// =============================================================
+function showBanner(html){ const b = g('authBanner'); if(b){ b.className = 'auth-banner show'; b.innerHTML = html; } }
+function hideBanner(){ const b = g('authBanner'); if(b) b.className = 'auth-banner'; }
 function showSignIn(){
   showBanner('<strong>Sign in to sync with Google Sheets.</strong> <button id="bSignIn">Sign In</button>');
   g('bSignIn').onclick = signIn;
 }
 function signIn(){
   google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID, scope: SCOPE,
+    client_id: settings.clientId, scope: SCOPE,
     callback: r => {
       if (r.error){
         const desc = r.error_description || r.error || 'Sign in failed';
@@ -787,38 +939,34 @@ function signIn(){
         console.error('[OAuth]', r);
         return;
       }
-      token = r.access_token; hideBanner(); syncOnSignIn();
+      SheetsStore.token = r.access_token; SheetsStore.ready = true; hideBanner(); afterConnect();
     }
   }).requestAccessToken();
 }
 
 // =============================================================
-// ACTIONS (optimistic) — entries only; holidays are sheet-managed
+// ACTIONS (optimistic)
 // =============================================================
 async function applyChange({k, type, note, action}){
   if (busy) return;
-  if (!token){ alert('Sign in first to sync changes to Google Sheets.'); return; }
+  if (!Store.ready){ alert('Not connected yet. Open Settings to connect, or switch to Local mode.'); return; }
   const before = entries[k] ? {...entries[k]} : null;
   if (action === 'delete'){ delete entries[k]; }
   else {
-    entries[k] = {
-      type,
-      note: note != null ? note : (before?.note ?? ''),
-      row: before?.row
-    };
+    entries[k] = {type, note: note != null ? note : (before?.note ?? ''), row: before?.row};
   }
   setBusy(true);
   setSync('busy','Saving…');
   render();
   try {
     if (action === 'delete'){
-      if (before?.row){ await clearRow(before.row); }
+      await Store.clearRow(k, before?.row);
     } else {
-      const newRow = await writeRow(k, type, entries[k].note, before?.row);
+      const newRow = await Store.writeRow(k, type, entries[k].note, before?.row);
       if (newRow){ entries[k].row = newRow; }
     }
     setSync('ok','Saved ✓');
-  } catch (e){
+  } catch(e){
     console.error(e);
     if (before){ entries[k] = before; } else { delete entries[k]; }
     setSync('err','Save failed');
@@ -834,12 +982,12 @@ function submitEntry(){
   const note = g('fNote').value.trim();
   if (!dv){ alert('Please select a date.'); return; }
   const {y, m, d} = parseKey(dv);
-  if (isWknd(y,m,d)){ alert('Weekends do not need tracking.'); return; }
-  if (isPre(y,m,d)){ alert(`That date is before your ${START_DATE} start.`); return; }
+  if (!isWorkday(y,m,d)){ alert('That day is outside your work week (set your work days in Settings).'); return; }
+  if (isPre(y,m,d)){ alert(`That date is before your ${settings.startDate} start.`); return; }
   if (isHol(dv)){
     const hn = holidayName(dv);
     const ht = holidayType(dv);
-    alert(`That date is a holiday in your sheet${hn ? ': ' + hn : ''}${ht ? ' (' + ht + ')' : ''}. Holidays are auto-excluded from compliance. Use Floating Holiday for a personal float day.`);
+    alert(`That date is a holiday${hn ? ': ' + hn : ''}${ht ? ' (' + ht + ')' : ''}. Holidays are auto-excluded from compliance. Use Floating Holiday for a personal float day.`);
     return;
   }
   applyChange({k: dv, type, note, action: 'set'}).then(() => {
@@ -853,12 +1001,26 @@ function confirmEntry(k){
   const ex = entries[k]; if (!ex) return;
   applyChange({k, type: 's-' + baseT(ex.type), note: ex.note, action: 'set'});
 }
-const CYCLE = [null, 's-office', 's-remote', 'p-office', 'p-pto', 'p-travel', null];
+// Quick-cycle: empty → confirmed office → confirmed eligible → planned office → empty.
+// Derived from the registry so it adapts to renamed/added statuses.
+function buildCycle(){
+  const list = statusList();
+  const office = list.find(s => s.behavior === 'office');
+  const elig = list.find(s => s.behavior === 'eligible');
+  const c = [null];
+  if (office) c.push('s-' + office.key);
+  if (elig) c.push('s-' + elig.key);
+  if (office) c.push('p-' + office.key);
+  c.push(null);
+  return c;
+}
 function quickCycle(k){
   if (isHol(k) || busy) return;
+  const cyc = buildCycle();
   const cur = entries[k]?.type || null;
-  const idx = CYCLE.indexOf(cur);
-  const next = CYCLE[(idx + 1) % CYCLE.length];
+  let idx = cyc.indexOf(cur);
+  if (idx === -1) idx = 0;   // unknown/removed status → restart cycle
+  const next = cyc[(idx + 1) % cyc.length];
   if (next === null){ applyChange({k, action: 'delete'}); }
   else { applyChange({k, type: next, note: entries[k]?.note || '', action: 'set'}); }
 }
@@ -871,7 +1033,7 @@ function getStalePlanned(){
 }
 async function bulkConfirmStale(){
   if (busy) return;
-  if (!token){ alert('Sign in first to sync changes.'); return; }
+  if (!Store.ready){ alert('Not connected yet.'); return; }
   const stale = getStalePlanned();
   if (!stale.length) return;
   if (!confirm(`Promote ${stale.length} past planned day(s) to confirmed?\nEach keeps its type (p-office → s-office, p-pto → s-pto, etc).\nReview individually instead if any plan didn't actually happen.`)) return;
@@ -886,8 +1048,9 @@ async function bulkConfirmStale(){
   let done = 0, failed = 0;
   for (const [k] of stale){
     try {
-      await writeRow(k, entries[k].type, entries[k].note, entries[k].row);
-    } catch (e){
+      const newRow = await Store.writeRow(k, entries[k].type, entries[k].note, entries[k].row);
+      if (newRow){ entries[k].row = newRow; }
+    } catch(e){
       console.error(e);
       failed++;
       entries[k] = before[k];
@@ -908,11 +1071,12 @@ function updateTypeFromDate(){
   const future = (y > t.y) || (y === t.y && m > t.m) || (y === t.y && m === t.m && d > t.d);
   const cur = g('fType').value;
   const curBase = baseT(cur);
-  if (future && !cur.startsWith('p-') && curBase !== 'sick'){
-    const planMap = {office:'p-office', remote:'p-remote', pto:'p-pto', travel:'p-travel', fhol:'p-fhol'};
-    if (planMap[curBase]) g('fType').value = planMap[curBase];
+  if (future && cur.startsWith('s-')){
+    const v = 'p-' + curBase;
+    if ([...g('fType').options].some(o => o.value === v)) g('fType').value = v;
   } else if (!future && cur.startsWith('p-')){
-    g('fType').value = 's-' + curBase;
+    const v = 's-' + curBase;
+    if ([...g('fType').options].some(o => o.value === v)) g('fType').value = v;
   }
 }
 
@@ -920,15 +1084,16 @@ function updateTypeFromDate(){
 // RENDER
 // =============================================================
 function render(){
+  if (!settings) return;
   const t = today();
   const s = calcStats(viewY, viewM);
+  const T = settings.targetPct;
+  const Twarn = T * 0.75;
   g('monthName').textContent = MONTHS[viewM];
   g('monthYear').textContent = String(viewY);
   g('btnPrev').disabled = (viewY === START.y && viewM === START.m);
   g('btnNext').disabled = (viewY === CAL_END_Y && viewM >= CAL_END_M);
   const cr = s.cr, pr = s.pr;
-  const T = TARGET_PCT;
-  const Twarn = T * 0.75;
   setVal('sRate', cr + '%', cr >= T ? 'var(--teal-dk)' : cr >= Twarn ? 'var(--amber)' : 'var(--rose)');
   setVal('sProj', pr + '%', pr >= T ? 'var(--travel)'  : pr >= Twarn ? 'var(--amber)' : 'var(--rose)');
   g('sElig').textContent = s.elig;
@@ -956,6 +1121,17 @@ function render(){
   renderLog(viewY, viewM);
 }
 
+function renderWeekdayHeader(){
+  const wd = g('calWdays');
+  wd.innerHTML = '';
+  for (let i = 0; i < 7; i++){
+    const el = mk('div', 'cal-wday');
+    el.textContent = DAYS[i];
+    if (!settings.workdays.includes(i)) el.style.opacity = '.4';
+    wd.appendChild(el);
+  }
+}
+
 function renderCal(t, y, m, stale){
   const grid = g('calGrid');
   grid.innerHTML = '';
@@ -965,7 +1141,7 @@ function renderCal(t, y, m, stale){
   for (let i = 0; i < first; i++){ grid.appendChild(mk('div', 'cd x-e')); }
   for (let d = 1; d <= total; d++){
     const k = key(y, m, d);
-    const wknd = isWknd(y, m, d);
+    const wknd = !isWorkday(y, m, d);
     const pre = isPre(y, m, d);
     const hol = isHol(k);
     const tod = (y === t.y && m === t.m && d === t.d);
@@ -975,23 +1151,22 @@ function renderCal(t, y, m, stale){
     if (wknd) cell.classList.add('x-w');
     else if (pre) cell.classList.add('x-p');
     else if (hol) cell.classList.add('x-h');
-    else if (type) cell.classList.add(type);
     if (tod) cell.classList.add('x-t');
     if (staleSet.has(k)) cell.classList.add('stale');
+    // Colored status fill (inline, so custom colors work)
+    if (!wknd && !pre && !hol && type){
+      const c = statusColor(b);
+      if (isPlan(type)){ cell.style.background = hexToRgba(c, 0.10); cell.style.border = '2px dashed ' + hexToRgba(c, 0.5); }
+      else { cell.style.background = hexToRgba(c, 0.20); cell.style.borderColor = hexToRgba(c, 0.55); }
+    }
     const num = mk('div', 'dn'); num.textContent = d; cell.appendChild(num);
+    if (!hol && type && !wknd && !pre) num.style.color = statusColor(b);
     if (!wknd && !pre){
       let tag = '';
+      let tagCol = '';
       if (hol) tag = 'HOL';
-      else if (type){
-        const px = isPlan(type) ? '~' : '';
-        if (b === 'office') tag = px + 'OFF';
-        else if (b === 'remote') tag = px + 'RMT';
-        else if (b === 'pto') tag = px + 'PTO';
-        else if (b === 'sick') tag = 'SICK';
-        else if (b === 'travel') tag = px + 'TRVL';
-        else if (b === 'fhol') tag = px + 'FHL';
-      }
-      if (tag){ const t2 = mk('div', 'dt'); t2.textContent = tag; cell.appendChild(t2); }
+      else if (type){ tag = (isPlan(type) ? '~' : '') + statusTag(b); tagCol = statusColor(b); }
+      if (tag){ const t2 = mk('div', 'dt'); t2.textContent = tag; if (tagCol) t2.style.color = tagCol; cell.appendChild(t2); }
     }
     if (!wknd && !pre && !hol){
       const ent = entries[k];
@@ -1048,10 +1223,10 @@ function renderLog(y, m){
       const sp = mk('span', 'pill ' + (planned ? 'pk-plan' : 'pk-conf'));
       sp.textContent = planned ? 'Planned' : 'Confirmed';
       badges.appendChild(sp);
-      const tp = mk('span', 'pill pk-' + b);
-      tp.textContent = b === 'office' ? 'Office' : b === 'remote' ? 'Remote'
-        : b === 'pto' ? 'PTO' : b === 'sick' ? 'Sick'
-        : b === 'travel' ? 'Travel' : 'Float Hol';
+      const tp = mk('span', 'pill');
+      tp.textContent = statusLabel(b);
+      tp.style.background = hexToRgba(statusColor(b), 0.16);
+      tp.style.color = statusColor(b);
       badges.appendChild(tp);
     }
     const nEl = mk('div', 'ln'); nEl.textContent = ent.note || '';
@@ -1072,11 +1247,500 @@ function renderLog(y, m){
 }
 
 // =============================================================
-// UTILS
+// HEADER CHROME (reflects current settings/mode)
+// =============================================================
+function syncHeaderChrome(){
+  g('brandEyebrow').textContent = settings.name ? `${settings.name} · Hybrid Compliance` : 'Hybrid Office Compliance';
+  const yy = String(START.y).slice(-2);
+  g('startPill').textContent = `Start · ${MONTHS[START.m]?.slice(0,3) || '—'} ${START.d} '${yy}`;
+  g('progTgtLabel').textContent = `${settings.targetPct}% target`;
+  g('progTitle').textContent = `${settings.targetPct}% Compliance · Confirmed vs Projected`;
+  g('progTgt').style.left = settings.targetPct + '%';
+  const link = g('sheetLink');
+  if (settings.storageMode === 'sheets' && settings.sheetId){
+    link.href = `https://docs.google.com/spreadsheets/d/${settings.sheetId}/edit`;
+    link.classList.remove('hide');
+  } else {
+    link.classList.add('hide');
+  }
+  renderWeekdayHeader();
+  populateTypeSelect();
+  renderLegend();
+}
+
+// Rebuild the Log-a-Day status dropdown from the registry (preserve selection).
+function populateTypeSelect(){
+  const sel = g('fType');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  const og1 = mk('optgroup'); og1.label = 'Confirmed (happened)';
+  const og2 = mk('optgroup'); og2.label = 'Planned (upcoming)';
+  statusList().forEach(s => {
+    const o1 = mk('option'); o1.value = 's-' + s.key; o1.textContent = s.label; og1.appendChild(o1);
+    const o2 = mk('option'); o2.value = 'p-' + s.key; o2.textContent = 'Plan: ' + s.label; og2.appendChild(o2);
+  });
+  sel.append(og1, og2);
+  if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
+// Rebuild the legend from the registry.
+function renderLegend(){
+  const lg = g('legend');
+  if (!lg) return;
+  lg.innerHTML = '';
+  statusList().forEach(s => {
+    const li = mk('div','li');
+    const sw = mk('div','ls');
+    sw.style.background = hexToRgba(s.color, 0.22);
+    sw.style.border = '1.5px solid ' + hexToRgba(s.color, 0.55);
+    li.append(sw, document.createTextNode(s.label));
+    lg.appendChild(li);
+  });
+  const hol = mk('div','li');
+  const hsw = mk('div','ls');
+  hsw.style.cssText = 'background:var(--hol-bg);border:1.5px solid rgba(91,33,182,.45)';
+  hol.append(hsw, document.createTextNode('Holiday'));
+  lg.appendChild(hol);
+  const li = mk('div','li');
+  const sw = mk('div','ls');
+  sw.style.cssText = 'background:#F5F4F0;border:2px dashed #9CA3AF';
+  li.append(sw, document.createTextNode('= Planned'));
+  lg.appendChild(li);
+}
+
+// =============================================================
+// MODAL primitives
+// =============================================================
+function showModal(){ const m = g('modal'); m.classList.add('show'); m.setAttribute('aria-hidden','false'); }
+function hideModal(){ const m = g('modal'); m.classList.remove('show'); m.setAttribute('aria-hidden','true'); }
+
+// =============================================================
+// ONBOARDING (first run)
+// =============================================================
+function openOnboarding(){
+  g('modalTitle').textContent = 'Welcome 👋';
+  g('modalSub').textContent = 'Track your hybrid in-office compliance. Two quick choices and you’re set — change anything later in Settings.';
+  const body = g('modalBody');
+  body.innerHTML = '';
+
+  const draft = {...DEFAULTS};
+
+  body.appendChild(fieldRow([
+    fldInput('ob-name', 'Your name (optional)', 'text', draft.name, 'e.g. Alex'),
+    fldSelect('ob-country', 'Holiday region', countryOpts(), draft.country),
+  ]));
+  body.appendChild(fieldRow([
+    fldInput('ob-start', 'Tracking start date', 'date', draft.startDate),
+    fldInput('ob-target', 'Office target %', 'number', String(draft.targetPct)),
+  ]));
+
+  const modeLbl = mk('div','sect-lbl'); modeLbl.textContent = 'Where should your data live?';
+  body.appendChild(modeLbl);
+  const choice = mk('div','choice');
+  choice.innerHTML = `
+    <button type="button" data-mode="local">
+      <div class="ct">This device only <span class="ctag">No setup</span></div>
+      <div class="cdesc">Saved privately in this browser. Works instantly — nothing to configure. Best for getting started.</div>
+    </button>
+    <button type="button" data-mode="appsscript">
+      <div class="ct">Sync to a Google Sheet <span class="ctag">No OAuth</span></div>
+      <div class="cdesc">Your data lives in your own Google Sheet and follows you across devices. One-time: paste a small script into the sheet and copy its Web App URL. No Google Cloud, no sign-in popups.</div>
+    </button>`;
+  body.appendChild(choice);
+
+  // Cards SELECT a mode; the footer button commits — so there's always a
+  // visible primary action, even if the cards scroll below the fold.
+  let chosenMode = 'local';
+  const cards = [...choice.querySelectorAll('button')];
+  const paintCards = () => cards.forEach(c => c.classList.toggle('sel', c.dataset.mode === chosenMode));
+  cards.forEach(btn => { btn.onclick = () => { chosenMode = btn.dataset.mode; paintCards(); }; });
+  paintCards();
+
+  const start = () => {
+    settings = {
+      ...DEFAULTS,
+      name: g('ob-name').value.trim(),
+      country: g('ob-country').value,
+      startDate: g('ob-start').value || DEFAULTS.startDate,
+      targetPct: clampPct(g('ob-target').value),
+      storageMode: chosenMode,
+    };
+    ensureDefaults(settings);
+    saveSettings();
+    if (chosenMode !== 'local'){ openSettings(true); return; }
+    hideModal();
+    setupStore();
+  };
+
+  const foot = g('modalFoot');
+  foot.innerHTML = '';
+  const go = mk('button','btn-primary');
+  go.type = 'button';
+  go.textContent = 'Start tracking →';
+  go.onclick = start;
+  foot.appendChild(go);
+  showModal();
+}
+
+// =============================================================
+// SETTINGS PANEL
+// =============================================================
+function openSettings(fromOnboarding){
+  const draft = JSON.parse(JSON.stringify(settings));
+  g('modalTitle').textContent = fromOnboarding ? 'Connect your Google Sheet' : 'Settings';
+  g('modalSub').textContent = fromOnboarding
+    ? 'Deploy the one-file Apps Script (apps-script/Code.gs) as a Web App, then paste its URL below. No Google Cloud or OAuth needed.'
+    : 'Everything here is yours to change. Saved on this device.';
+  const body = g('modalBody');
+  body.innerHTML = '';
+
+  // --- Profile + compliance ---
+  body.appendChild(sectLabel('Profile & target'));
+  body.appendChild(fieldRow([
+    fldInput('set-name', 'Your name', 'text', draft.name, 'optional'),
+    fldInput('set-target', 'Office target %', 'number', String(draft.targetPct)),
+  ]));
+  body.appendChild(fieldRow([
+    fldInput('set-start', 'Tracking start date', 'date', draft.startDate),
+    fldSelect('set-country', 'Holiday region', countryOpts(), draft.country),
+  ]));
+
+  // --- Work week ---
+  body.appendChild(sectLabel('Work week (which days count)'));
+  const wk = mk('div','wk');
+  DAYS.forEach((nm, i) => {
+    const b = mk('button'); b.type='button'; b.textContent = nm.slice(0,2);
+    if (draft.workdays.includes(i)) b.classList.add('on');
+    b.onclick = () => {
+      const idx = draft.workdays.indexOf(i);
+      if (idx >= 0) draft.workdays.splice(idx,1); else draft.workdays.push(i);
+      draft.workdays.sort();
+      b.classList.toggle('on');
+    };
+    wk.appendChild(b);
+  });
+  body.appendChild(wk);
+
+  // --- Statuses (rename / recolor / add your own) ---
+  body.appendChild(sectLabel('Statuses · rename, recolor, add your own'));
+  const stWrap = mk('div'); stWrap.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
+  body.appendChild(stWrap);
+  const addStBtn = mk('button','btn-add'); addStBtn.type='button'; addStBtn.textContent='+ Add status';
+  addStBtn.style.alignSelf = 'flex-start';
+  body.appendChild(addStBtn);
+  const drawStatuses = () => {
+    stWrap.innerHTML = '';
+    draft.statuses.forEach((s, idx) => {
+      const row = mk('div');
+      row.style.cssText = 'display:grid;grid-template-columns:34px 1fr auto 22px;gap:6px;align-items:center;';
+      const col = mk('input'); col.type='color'; col.value = s.color;
+      col.style.cssText = 'width:34px;height:34px;padding:2px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;';
+      col.oninput = () => { s.color = col.value; };
+      const lab = mk('input'); lab.type='text'; lab.value = s.label; lab.placeholder='Label';
+      lab.style.cssText = 'padding:8px 9px;font-size:12px;background:#FAF8F4;border:1.5px solid var(--border);border-radius:var(--r-sm);min-width:0;';
+      lab.oninput = () => { s.label = lab.value; };
+      const beh = mk('select');
+      beh.style.cssText = 'padding:8px 6px;font-size:11px;background:#FAF8F4;border:1.5px solid var(--border);border-radius:var(--r-sm);';
+      STATUS_BEHAVIORS.forEach(bo => { const o = mk('option'); o.value = bo.v; o.textContent = bo.t; if (s.behavior===bo.v) o.selected = true; beh.appendChild(o); });
+      beh.onchange = () => { s.behavior = beh.value; };
+      const rm = mk('button','cx'); rm.type='button'; rm.textContent='✕';
+      if (BUILTIN_KEYS.has(s.key)){ rm.disabled = true; rm.style.opacity = '.25'; rm.title = 'Built-in (cannot remove)'; }
+      else { rm.title = 'Remove'; rm.onclick = () => { draft.statuses.splice(idx,1); drawStatuses(); }; }
+      row.append(col, lab, beh, rm);
+      stWrap.appendChild(row);
+    });
+  };
+  addStBtn.onclick = () => {
+    draft.statuses.push({key: uniqueStatusKey('status', draft.statuses), label:'New status', color:'#0D7A5C', behavior:'eligible'});
+    drawStatuses();
+  };
+  drawStatuses();
+
+  // --- Custom holidays ---
+  body.appendChild(sectLabel('Company / custom holidays (excluded from compliance)'));
+  const chips = mk('div','chips'); body.appendChild(chips);
+  const add = mk('div','add-hol');
+  add.innerHTML = `<input type="date" id="ch-date"><input type="text" id="ch-name" placeholder="Holiday name">`;
+  const addBtn = mk('button','btn-add'); addBtn.type='button'; addBtn.textContent='Add';
+  add.appendChild(addBtn);
+  body.appendChild(add);
+  const drawChips = () => {
+    chips.innerHTML = '';
+    const list = (draft.customHolidays || []).slice().sort((a,b)=>a.date.localeCompare(b.date));
+    if (!list.length){ chips.innerHTML = '<div class="chips-empty">None yet. Country holidays for your region are already included automatically.</div>'; return; }
+    list.forEach(h => {
+      const c = mk('div','chip');
+      const dd = mk('div','cd2'); dd.textContent = h.date;
+      const nn = mk('div','cn'); nn.textContent = h.name || 'Holiday';
+      const x = mk('button','cx'); x.type='button'; x.textContent='✕';
+      x.onclick = () => { draft.customHolidays = draft.customHolidays.filter(o => !(o.date===h.date && o.name===h.name)); drawChips(); };
+      c.append(dd, nn, x);
+      chips.appendChild(c);
+    });
+  };
+  addBtn.onclick = () => {
+    const dt = g('ch-date').value, nm = g('ch-name').value.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dt)){ alert('Pick a valid date.'); return; }
+    draft.customHolidays = (draft.customHolidays || []).filter(o => o.date !== dt);
+    draft.customHolidays.push({date: dt, name: nm || 'Company Holiday', type: 'Company'});
+    g('ch-date').value = ''; g('ch-name').value = '';
+    drawChips();
+  };
+  drawChips();
+
+  // --- Storage mode (local / Apps Script-no-OAuth / OAuth-advanced) ---
+  body.appendChild(sectLabel('Where your data lives'));
+  const MODES = [
+    {id:'local',      label:'This device'},
+    {id:'appsscript', label:'Google Sheet'},
+    {id:'sheets',     label:'Sheet · OAuth'},
+  ];
+  const seg = mk('div','seg');
+  const asBox    = mk('div','sheets-only' + (draft.storageMode==='appsscript' ? ' show' : ''));
+  const oauthBox = mk('div','sheets-only' + (draft.storageMode==='sheets' ? ' show' : ''));
+  const refreshBoxes = () => {
+    asBox.classList.toggle('show', draft.storageMode==='appsscript');
+    oauthBox.classList.toggle('show', draft.storageMode==='sheets');
+  };
+  MODES.forEach(m => {
+    const b = mk('button'); b.type='button'; b.textContent = m.label;
+    if (draft.storageMode === m.id) b.classList.add('on');
+    b.onclick = () => { draft.storageMode = m.id; seg.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); refreshBoxes(); };
+    seg.appendChild(b);
+  });
+  body.appendChild(seg);
+  // Apps Script (recommended — no OAuth)
+  const asHint = mk('div','fld');
+  asHint.innerHTML = '<div class="hint"><strong>Recommended.</strong> No Google Cloud or sign-in popups. Deploy the one-file script (<code>apps-script/Code.gs</code>) as a Web App, then paste its URL here.</div>';
+  asBox.appendChild(asHint);
+  asBox.appendChild(fldInput('set-scripturl', 'Web App URL', 'text', draft.scriptUrl, 'https://script.google.com/macros/s/…/exec'));
+  asBox.appendChild(fldInput('set-scripttoken', 'Shared secret (optional)', 'text', draft.scriptToken, 'must match TOKEN in the script'));
+  body.appendChild(asBox);
+  // OAuth (advanced)
+  const oaHint = mk('div','fld');
+  oaHint.innerHTML = '<div class="hint"><strong>Advanced.</strong> Direct Sheets API — lower latency, but needs a Google Cloud OAuth client.</div>';
+  oauthBox.appendChild(oaHint);
+  oauthBox.appendChild(fldInput('set-sheet', 'Google Sheet ID', 'text', draft.sheetId, 'from the sheet URL: /d/[THIS]/edit'));
+  oauthBox.appendChild(fldInput('set-client', 'OAuth Client ID', 'text', draft.clientId, 'xxxxx.apps.googleusercontent.com'));
+  body.appendChild(oauthBox);
+
+  // --- Data portability ---
+  if (!fromOnboarding){
+    body.appendChild(sectLabel('Backup & portability'));
+    const port = mk('div','seg');
+    const expB = mk('button'); expB.type='button'; expB.textContent='⬇ Export JSON';
+    const impB = mk('button'); impB.type='button'; impB.textContent='⬆ Import JSON';
+    const icsB = mk('button'); icsB.type='button'; icsB.textContent='⬇ Calendar (.ics)';
+    expB.onclick = exportData;
+    impB.onclick = importData;
+    icsB.onclick = exportICS;
+    port.append(expB, impB, icsB);
+    body.appendChild(port);
+  }
+
+  // --- Footer ---
+  const foot = g('modalFoot');
+  foot.innerHTML = '';
+  if (!fromOnboarding){
+    const stamp = mk('span','spacer'); stamp.style.fontSize='10px'; stamp.style.color='var(--muted)';
+    stamp.textContent = 'build ' + APP_BUILD;
+    foot.appendChild(stamp);
+  }
+  const cancel = mk('button','btn-ghost'); cancel.type='button'; cancel.textContent = fromOnboarding ? 'Back' : 'Cancel';
+  cancel.onclick = () => { if (fromOnboarding){ hideModal(); openOnboarding(); } else hideModal(); };
+  const save = mk('button','btn-primary'); save.type='button'; save.textContent = 'Save';
+  save.onclick = () => {
+    draft.name = g('set-name').value.trim();
+    draft.targetPct = clampPct(g('set-target').value);
+    draft.startDate = g('set-start').value || draft.startDate;
+    draft.country = g('set-country').value;
+    if (!draft.workdays.length){ alert('Pick at least one work day.'); return; }
+    if (g('set-sheet')) draft.sheetId = g('set-sheet').value.trim();
+    if (g('set-client')) draft.clientId = g('set-client').value.trim();
+    if (g('set-scripturl')) draft.scriptUrl = g('set-scripturl').value.trim();
+    if (g('set-scripttoken')) draft.scriptToken = g('set-scripttoken').value.trim();
+    const modeChanged = draft.storageMode !== settings.storageMode
+      || draft.sheetId !== settings.sheetId || draft.clientId !== settings.clientId
+      || draft.scriptUrl !== settings.scriptUrl || draft.scriptToken !== settings.scriptToken;
+    settings = draft;
+    saveSettings();
+    buildStatusIndex();
+    hideModal();
+    if (modeChanged){ SheetsStore.ready = false; SheetsStore.token = null; AppsScriptStore.ready = false; setupStore(); }
+    else { applySettings(); buildHolidays(); syncHeaderChrome(); render(); }
+  };
+  foot.append(cancel, save);
+  showModal();
+}
+
+// =============================================================
+// EXPORT / IMPORT
+// =============================================================
+function exportData(){
+  const payload = {app:'hybrid-attendance-tracker', build:APP_BUILD, exportedAt:fullTimestamp(), settings, entries};
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const t = today();
+  a.href = url; a.download = `attendance-backup-${key(t.y,t.m,t.d)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+function importData(){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'application/json,.json';
+  inp.onchange = () => {
+    const file = inp.files?.[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        if (!data || typeof data !== 'object') throw new Error('Not a valid backup file.');
+        if (!confirm('Import will replace your current settings and entries on this device. Continue?')) return;
+        if (data.settings) settings = ensureDefaults({...DEFAULTS, ...data.settings});
+        saveSettings();
+        const imported = {};
+        for (const [k,v] of Object.entries(data.entries || {})){
+          if (/^\d{4}-\d{2}-\d{2}$/.test(k) && v?.type) imported[k] = {type:v.type, note:v.note||''};
+        }
+        entries = imported;
+        if (settings.storageMode === 'local'){ LocalStore._persist(); }
+        hideModal();
+        setupStore();
+        alert('Imported ✓');
+      } catch(e){ alert('Import failed: ' + e.message); }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+// =============================================================
+// .ics CALENDAR EXPORT — one all-day event per logged day
+// =============================================================
+function icsEsc(s){ return String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n'); }
+function nextDayCompact(k){
+  const {y,m,d} = parseKey(k);
+  const dt = new Date(y, m, d+1);
+  return `${dt.getFullYear()}${pad2(dt.getMonth()+1)}${pad2(dt.getDate())}`;
+}
+function buildICS(){
+  const dt = new Date();
+  const z = n => String(n).padStart(2,'0');
+  const stamp = `${dt.getUTCFullYear()}${z(dt.getUTCMonth()+1)}${z(dt.getUTCDate())}T${z(dt.getUTCHours())}${z(dt.getUTCMinutes())}${z(dt.getUTCSeconds())}Z`;
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Hybrid Attendance Tracker//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+  Object.entries(entries).sort(([a],[b]) => a.localeCompare(b)).forEach(([k, ent]) => {
+    if (!ent?.type) return;
+    const base = baseT(ent.type);
+    const planned = isPlan(ent.type);
+    const compact = k.replace(/-/g,'');
+    lines.push('BEGIN:VEVENT');
+    lines.push(`UID:${k}-${base}@attendance-tracker`);
+    lines.push(`DTSTAMP:${stamp}`);
+    lines.push(`DTSTART;VALUE=DATE:${compact}`);
+    lines.push(`DTEND;VALUE=DATE:${nextDayCompact(k)}`);
+    lines.push(`SUMMARY:${icsEsc((planned ? '[Plan] ' : '') + statusLabel(base))}`);
+    lines.push(`CATEGORIES:${icsEsc(statusLabel(base))}`);
+    if (ent.note) lines.push(`DESCRIPTION:${icsEsc(ent.note)}`);
+    lines.push('TRANSP:TRANSPARENT');
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
+}
+function exportICS(){
+  const blob = new Blob([buildICS()], {type:'text/calendar'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const t = today();
+  a.href = url; a.download = `attendance-${key(t.y,t.m,t.d)}.ics`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// =============================================================
+// QUARTERLY ROLLUP — compliance per quarter, START → current
+// =============================================================
+function quarterRows(){
+  const t = today();
+  const rows = [];
+  let qy = START.y, qi = Math.floor(START.m / 3);
+  const endQy = t.y, endQi = Math.floor(t.m / 3);
+  while (qy < endQy || (qy === endQy && qi <= endQi)){
+    let fM = qi * 3;
+    if (qy === START.y && fM < START.m) fM = START.m;     // clamp to start
+    let tM = qi * 3 + 2;
+    if (qy === endQy && qi === endQi && tM > t.m) tM = t.m; // clamp current quarter to date
+    rows.push({label:`Q${qi+1} ${qy}`, s: calcRange(qy, fM, qy, tM)});
+    if (++qi > 3){ qi = 0; qy++; }
+  }
+  return rows.reverse(); // most recent first
+}
+function openRollups(){
+  g('modalTitle').textContent = 'Quarterly summary';
+  g('modalSub').textContent = `In-office compliance by quarter · ${settings.targetPct}% target (figures are to date)`;
+  const body = g('modalBody');
+  body.innerHTML = '';
+  const T = settings.targetPct, Twarn = T * 0.75;
+  const rows = quarterRows();
+  if (!rows.length){
+    body.innerHTML = '<div class="chips-empty">No quarters in range yet.</div>';
+  } else {
+    rows.forEach(({label, s}) => {
+      const cr = s.cr;
+      const col = cr >= T ? 'var(--teal-dk)' : cr >= Twarn ? 'var(--amber)' : 'var(--rose)';
+      const bar = cr >= T ? '#22c55e' : cr >= Twarn ? '#f59e0b' : '#ef4444';
+      const card = mk('div');
+      card.style.cssText = 'border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 15px;display:flex;flex-direction:column;gap:8px;';
+      const top = mk('div');
+      top.style.cssText = 'display:flex;justify-content:space-between;align-items:baseline;gap:10px;';
+      top.innerHTML = `<span style="font-weight:700;font-size:13px;">${label}</span>`
+        + `<span style="font-family:'Fraunces',serif;font-weight:900;font-size:22px;color:${col};font-variant-numeric:tabular-nums;">${cr}%</span>`;
+      const track = mk('div');
+      track.style.cssText = 'position:relative;background:#EFECE5;border-radius:6px;height:8px;overflow:hidden;';
+      track.innerHTML = `<div style="position:absolute;inset:0 ${100-Math.min(cr,100)}% 0 0;background:${bar};border-radius:6px;"></div>`
+        + `<div style="position:absolute;top:-2px;bottom:-2px;left:${T}%;width:2px;background:var(--amber);"></div>`;
+      const sub = mk('div');
+      sub.style.cssText = 'font-size:11.5px;color:var(--muted2);display:flex;gap:12px;flex-wrap:wrap;';
+      sub.innerHTML = `<span><strong style="color:var(--text2)">${s.cOff}</strong>/${s.pastElig} office days</span>`
+        + `<span>${s.excl} excluded</span>`
+        + `<span style="color:${cr>=T?'var(--office)':'var(--rose)'};font-weight:700;">${cr>=T?'✓ met':'below target'}</span>`;
+      card.append(top, track, sub);
+      body.appendChild(card);
+    });
+  }
+  const foot = g('modalFoot');
+  foot.innerHTML = '';
+  const close = mk('button','btn-primary'); close.type='button'; close.textContent='Close';
+  close.onclick = hideModal;
+  foot.appendChild(close);
+  showModal();
+}
+
+// =============================================================
+// SMALL UI BUILDERS
 // =============================================================
 const g = id => document.getElementById(id);
 const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
 const setVal = (id, val, color) => { const e = g(id); e.textContent = val; if (color) e.style.color = color; };
+const clampPct = v => Math.max(0, Math.min(100, parseInt(v,10) || 0));
+const countryOpts = () => Object.entries(COUNTRY_NAMES).map(([k,v]) => ({value:k, label:v}));
+function sectLabel(text){ const d = mk('div','sect-lbl'); d.textContent = text; return d; }
+function fieldRow(flds){ const r = mk('div','fld-row'); flds.forEach(f => r.appendChild(f)); return r; }
+function fldInput(id, label, type, value, ph){
+  const f = mk('div','fld');
+  const l = mk('label'); l.setAttribute('for', id); l.textContent = label;
+  const i = mk('input'); i.id = id; i.type = type; if (value != null) i.value = value; if (ph) i.placeholder = ph;
+  f.append(l, i); return f;
+}
+function fldSelect(id, label, opts, value){
+  const f = mk('div','fld');
+  const l = mk('label'); l.setAttribute('for', id); l.textContent = label;
+  const s = mk('select'); s.id = id;
+  opts.forEach(o => { const op = mk('option'); op.value = o.value; op.textContent = o.label; if (o.value===value) op.selected = true; s.appendChild(op); });
+  f.append(l, s); return f;
+}
+
 function setSync(state, msg){
   g('syncDot').className = 'sync-dot' + (state === 'ok' ? ' ok' : state === 'err' ? ' err' : ' busy');
   g('syncLabel').textContent = msg;
@@ -1097,21 +1761,7 @@ function nextMonth(){
 // INIT
 // =============================================================
 console.log('%c[Attendance Tracker] build ' + APP_BUILD, 'color:#0D7A5C;font-weight:600');
-{
-  const bs = g('buildStamp'); if (bs) bs.textContent = APP_BUILD;
-  const link = g('sheetLink');
-  if (link && SHEET_ID){
-    link.href = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
-  }
-  const sp = g('startPill');
-  if (sp){
-    const yy = String(START.y).slice(-2);
-    sp.textContent = `Start · ${MONTHS[START.m]?.slice(0,3) || '—'} ${START.d} '${yy}`;
-  }
-  g('progTgtLabel').textContent = `${TARGET_PCT}% target`;
-  g('progTitle').textContent = `${TARGET_PCT}% Compliance · Confirmed vs Projected`;
-  g('progTgt').style.left = TARGET_PCT + '%';
-}
+g('buildStamp').textContent = APP_BUILD;
 
 const _t = today();
 g('fDate').value = key(_t.y, _t.m, _t.d);
@@ -1119,6 +1769,8 @@ g('btnPrev').addEventListener('click', prevMonth);
 g('btnNext').addEventListener('click', nextMonth);
 g('logBtn').addEventListener('click', submitEntry);
 g('fDate').addEventListener('change', updateTypeFromDate);
+g('btnSettings').addEventListener('click', () => openSettings(false));
+g('btnRollup').addEventListener('click', () => { if (settings) openRollups(); });
 g('btnStaleConfirmAll').addEventListener('click', bulkConfirmStale);
 g('btnStaleScroll').addEventListener('click', () => {
   const stale = getStalePlanned();
@@ -1130,13 +1782,30 @@ g('btnStaleScroll').addEventListener('click', () => {
   }
   document.querySelector('.log-card')?.scrollIntoView({behavior:'smooth', block:'start'});
 });
+g('modal').addEventListener('click', e => { if (e.target === g('modal') && settings) hideModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && g('modal').classList.contains('show') && settings) hideModal(); });
+
+function boot(){
+  settings = loadSettings();
+  if (!settings){
+    // First run — paint header with defaults, then onboard.
+    settings = ensureDefaults({...DEFAULTS});
+    applySettings();
+    buildStatusIndex();
+    syncHeaderChrome();
+    settings = null;
+    openOnboarding();
+    return;
+  }
+  setupStore();
+}
 
 window.addEventListener('load', () => {
-  if (typeof google !== 'undefined' && google.accounts){ initAuth(); }
+  if (typeof google !== 'undefined' && google.accounts){ boot(); }
   else {
     const s = document.querySelector('script[src*="accounts.google.com"]');
-    if (s) s.addEventListener('load', initAuth);
-    else initAuth();
+    if (s){ s.addEventListener('load', boot); s.addEventListener('error', boot); }
+    else boot();
   }
 });
 </script>
