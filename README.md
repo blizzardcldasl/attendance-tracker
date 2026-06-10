@@ -72,6 +72,14 @@ The Sheet's `Tracker` tab (created automatically):
 Settings (target, holidays, statuses, work-week, etc.) live in `localStorage` on each
 device, and travel via **Export/Import JSON**.
 
+> **Per-device setup:** because settings are stored in `localStorage`, they are **not**
+> shared across devices or browsers. The *Sheet* is shared, but the config pointing at it
+> is not — so in a sync mode you must **enter the Web App URL (and token, if any) once on
+> each device/browser** you use. This is a one-time step per device, provided you keep a
+> stable `/exec` URL: when redeploying the Apps Script, use **Manage deployments ▸ edit the
+> existing deployment ▸ New version** (which keeps the same URL) rather than *New
+> deployment* (which mints a new URL and forces you to re-enter it everywhere).
+
 ## Tech notes
 
 - Single HTML file. No build, no bundler, no transpiler.
