@@ -29,8 +29,9 @@ function handle_(e) {
   const out = ContentService.createTextOutput().setMimeType(ContentService.MimeType.JSON);
   try {
     var req = {};
-    if (e && e.postData && e.postData.contents) req = JSON.parse(e.postData.contents);
-    else if (e && e.parameter)                  req = e.parameter;
+    if (e && e.postData && e.postData.contents)      req = JSON.parse(e.postData.contents);
+    else if (e && e.parameter && e.parameter.payload) req = JSON.parse(e.parameter.payload);
+    else if (e && e.parameter)                        req = e.parameter;
 
     if (TOKEN && String(req.token || '') !== TOKEN) throw new Error('Unauthorized');
 

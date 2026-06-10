@@ -30,25 +30,24 @@ This proves the endpoint works independent of the tracker, so we know any later
 failure is the app, not the deploy.
 
 1. Open any browser tab ▸ DevTools (⌥⌘I) ▸ **Console**.
-2. Paste this, replacing the URL with your `/exec` URL:
+2. Paste this, replacing the URL with your `/exec` URL. The app sends the request as a
+   single `payload` GET query parameter (no POST body), so test it the same way:
 
 ```js
-fetch('PASTE_YOUR_EXEC_URL', {
-  method: 'POST',
-  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-  body: JSON.stringify({ action: 'load', token: '' })
-}).then(r => r.json()).then(d => console.log('RESULT', d)).catch(e => console.error('FAILED', e));
+const EXEC = 'PASTE_YOUR_EXEC_URL';
+const call = p => fetch(EXEC + (EXEC.includes('?') ? '&' : '?')
+    + 'payload=' + encodeURIComponent(JSON.stringify({ ...p, token: '' }))
+    + '&_t=' + Date.now(), { method: 'GET', redirect: 'follow' }).then(r => r.json());
+
+call({ action: 'load' }).then(d => console.log('RESULT', d)).catch(e => console.error('FAILED', e));
 ```
 
 3. Then test a write:
 
 ```js
-fetch('PASTE_YOUR_EXEC_URL', {
-  method: 'POST',
-  headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-  body: JSON.stringify({ action: 'upsert', token: '',
-    row: ['2026-06-09','Tue','s-office','console test','2026-06-09 12:00:00'] })
-}).then(r => r.json()).then(d => console.log('WRITE', d)).catch(e => console.error('FAILED', e));
+call({ action: 'upsert',
+  row: ['2026-06-09','Tue','s-office','console test','2026-06-09 12:00:00'] })
+  .then(d => console.log('WRITE', d)).catch(e => console.error('FAILED', e));
 ```
 
 **Pass:** `RESULT {ok: true, values: [...]}` and `WRITE {ok: true}`, and a `Tracker`
