@@ -72,14 +72,24 @@ The Sheet's `Tracker` tab (created automatically):
 Settings (target, holidays, statuses, work-week, etc.) live in `localStorage` on each
 device, and travel via **Export/Import JSON**.
 
+> **Per-device setup:** because settings are stored in `localStorage`, they are **not**
+> shared across devices or browsers. The *Sheet* is shared, but the config pointing at it
+> is not — so in a sync mode you must **enter the Web App URL (and token, if any) once on
+> each device/browser** you use. This is a one-time step per device, provided you keep a
+> stable `/exec` URL: when redeploying the Apps Script, use **Manage deployments ▸ edit the
+> existing deployment ▸ New version** (which keeps the same URL) rather than *New
+> deployment* (which mints a new URL and forces you to re-enter it everywhere).
+
 ## Tech notes
 
 - Single HTML file. No build, no bundler, no transpiler.
 - **Storage adapter**: one interface (`init / loadEntries / writeRow / clearRow / ready`),
   three implementations — `LocalStore`, `AppsScriptStore` (no-OAuth), `SheetsStore` (OAuth).
-- **No-OAuth path**: the browser POSTs (`text/plain`, to avoid a CORS preflight) to a
+- **No-OAuth path**: the browser sends each request as a single `payload` GET query
+  parameter (no body, no custom headers → a "simple" request with no CORS preflight) to a
   deployed Apps Script Web App, which writes the Sheet server-side under the owner's
-  identity. The Web App URL is the only credential.
+  identity. The Web App URL is the only credential. GET (vs a POST body) also slips past
+  corporate DLP / upload-inspection proxies that block cross-origin POST uploads to Google.
 - **Status registry**: statuses + behaviors drive the compliance math; the calendar,
   legend, dropdown, log and quick-cycle all render from it (inline colors).
 - Optimistic UI: every mutation updates state and re-renders, then fires the write; on
