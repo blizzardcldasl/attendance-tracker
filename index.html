@@ -123,7 +123,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .cd.x-w{opacity:.22;}
 .cd.x-p{cursor:not-allowed;background:transparent;border-color:transparent;}
 .cd.x-p .dn{color:var(--muted);opacity:.55;}
-.cd.x-h{cursor:not-allowed;background:var(--hol-bg);border-color:rgba(91,33,182,.32);}
+.cd.x-h{cursor:pointer;background:var(--hol-bg);border-color:rgba(91,33,182,.32);}
 .cd.x-t{box-shadow:0 0 0 2.5px var(--teal),0 0 0 5.5px var(--teal-lt);z-index:2;}
 .cd.stale{box-shadow:0 0 0 2.5px var(--amber),0 0 0 5px rgba(217,119,6,.22);}
 .cd.stale.x-t{box-shadow:0 0 0 2.5px var(--amber),0 0 0 5px rgba(217,119,6,.22),0 0 0 7.5px var(--teal-lt);}
@@ -220,7 +220,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .wk{display:flex;gap:5px;}
 .wk button{flex:1;padding:8px 0;border:1.5px solid var(--border);border-radius:var(--r-sm);background:#FAF8F4;font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;transition:all .15s;}
 .wk button.on{border-color:var(--teal);background:var(--teal-lt);color:var(--teal-dk);}
-.chips{display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto;}
+.chips{display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto;flex-shrink:0;}
 .chip{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#FAF8F4;border:1px solid var(--border);border-radius:var(--r-sm);font-size:12px;}
 .chip .cd2{font-variant-numeric:tabular-nums;font-weight:700;color:var(--text);min-width:82px;}
 .chip .cn{flex:1;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -401,7 +401,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 // settings live in-app (no code editing). See enhancements/README.md.
 // ===========================================================================
 
-const APP_BUILD = '2026-09-27-f2';
+const APP_BUILD = '2026-10-01-h1';
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
 const LS_SETTINGS = 'az-tracker-settings-v1';
 const LS_ENTRIES  = 'az-tracker-entries-v1';
@@ -415,6 +415,7 @@ const DEFAULTS = {
   country: 'US',                 // holiday preset
   workdays: [1,2,3,4,5],         // 0=Sun … 6=Sat
   customHolidays: [],            // [{date:'YYYY-MM-DD', name, type}]
+  hiddenHolidays: [],            // ['YYYY-MM-DD'] region-preset holidays you don't get
   scriptUrl: '',                 // appsscript mode — deployed Web App URL
   scriptToken: '',               // appsscript mode — optional shared secret
   sheetId: '',                   // sheets mode (OAuth) only
@@ -617,13 +618,18 @@ const COUNTRY_RULES = {
 };
 
 // Build HOLIDAYS_MAP from the selected country preset across the visible
-// year range, then overlay user custom holidays (which always win).
+// year range (minus any the user turned off), then overlay user custom
+// holidays (which always win).
+function regionHolidays(yr, country){
+  const fn = COUNTRY_RULES[(country || settings.country || 'US').toUpperCase()] || COUNTRY_RULES.NONE;
+  return fn(yr).filter(h => h.key);
+}
 function buildHolidays(){
   const map = {};
-  const fn = COUNTRY_RULES[(settings.country || 'US').toUpperCase()] || COUNTRY_RULES.NONE;
+  const hidden = new Set(settings.hiddenHolidays || []);
   for (let yr = START.y - 1; yr <= CAL_END_Y + 1; yr++){
-    for (const h of fn(yr)){
-      if (h.key) map[h.key] = {name: h.name, type: h.observed ? 'Observed' : 'Public'};
+    for (const h of regionHolidays(yr)){
+      if (!hidden.has(h.key)) map[h.key] = {name: h.name, type: h.observed ? 'Observed' : 'Public'};
     }
   }
   for (const h of (settings.customHolidays || [])){
@@ -994,12 +1000,7 @@ function submitEntry(){
   const {y, m, d} = parseKey(dv);
   if (!isWorkday(y,m,d)){ alert('That day is outside your work week (set your work days in Settings).'); return; }
   if (isPre(y,m,d)){ alert(`That date is before your ${settings.startDate} start.`); return; }
-  if (isHol(dv)){
-    const hn = holidayName(dv);
-    const ht = holidayType(dv);
-    alert(`That date is a holiday${hn ? ': ' + hn : ''}${ht ? ' (' + ht + ')' : ''}. Holidays are auto-excluded from compliance. Use Floating Holiday for a personal float day.`);
-    return;
-  }
+  if (isHol(dv) && !offerUnholiday(dv)) return;
   applyChange({k: dv, type, note, action: 'set'}).then(() => {
     g('fNote').value = '';
     viewY = y; viewM = m;
@@ -1024,8 +1025,27 @@ function buildCycle(){
   c.push(null);
   return c;
 }
+// A holiday blocks logging. If the user doesn't actually get it off, let them
+// turn it off right here: region holidays go into hiddenHolidays, custom ones
+// are removed. Returns true if the day is now loggable.
+function offerUnholiday(k){
+  const hn = holidayName(k) || 'Holiday';
+  const ht = holidayType(k);
+  const custom = ht === 'Company' && (settings.customHolidays || []).some(h => h.date === k);
+  const ok = confirm(`${k} is marked as a holiday: ${hn}${ht ? ' (' + ht + ')' : ''}.\n\n` +
+    `Not a day off for you? Press OK to turn this holiday off so you can log the day.\n` +
+    `(You can turn it back on in Settings → Holidays.)`);
+  if (!ok) return false;
+  if (custom) settings.customHolidays = settings.customHolidays.filter(h => h.date !== k);
+  else settings.hiddenHolidays = [...new Set([...(settings.hiddenHolidays || []), k])];
+  saveSettings();
+  buildHolidays();
+  render();
+  return !isHol(k);
+}
 function quickCycle(k){
-  if (isHol(k) || busy) return;
+  if (busy) return;
+  if (isHol(k)){ offerUnholiday(k); return; }
   const cyc = buildCycle();
   const cur = entries[k]?.type || null;
   let idx = cyc.indexOf(cur);
@@ -1187,7 +1207,8 @@ function renderCal(t, y, m, stale){
     } else if (hol){
       const hn = holidayName(k) || 'Holiday';
       const ht = holidayType(k);
-      cell.title = ht ? `${hn} (${ht})` : hn;
+      cell.title = `${ht ? `${hn} (${ht})` : hn} — click if this isn't a day off for you`;
+      cell.onclick = () => quickCycle(k);
     }
     grid.appendChild(cell);
   }
@@ -1497,6 +1518,41 @@ function openSettings(fromOnboarding){
     drawChips();
   };
   drawChips();
+
+  // --- Region holidays (turn off ones your employer doesn't give) ---
+  body.appendChild(sectLabel('Region holidays · turn off any you don\'t get'));
+  const rhYearSel = mk('select');
+  rhYearSel.style.cssText = 'align-self:flex-start;padding:6px 8px;font-size:12px;background:#FAF8F4;border:1.5px solid var(--border);border-radius:var(--r-sm);';
+  [viewY - 1, viewY, viewY + 1].forEach(yr => { const o = mk('option'); o.value = yr; o.textContent = yr; if (yr === viewY) o.selected = true; rhYearSel.appendChild(o); });
+  body.appendChild(rhYearSel);
+  const rhChips = mk('div','chips'); rhChips.style.maxHeight = '220px'; body.appendChild(rhChips);
+  const drawRegion = () => {
+    rhChips.innerHTML = '';
+    const country = g('set-country') ? g('set-country').value : draft.country;
+    const list = regionHolidays(Number(rhYearSel.value), country);
+    if (!list.length){ rhChips.innerHTML = '<div class="chips-empty">No region holidays for this selection.</div>'; return; }
+    const hidden = new Set(draft.hiddenHolidays || []);
+    list.forEach(h => {
+      const off = hidden.has(h.key);
+      const c = mk('div','chip'); if (off) c.style.opacity = '.5';
+      const dd = mk('div','cd2'); dd.textContent = h.key;
+      const nn = mk('div','cn'); nn.textContent = h.name + (off ? ' — off' : '');
+      if (off) nn.style.textDecoration = 'line-through';
+      const x = mk('button','cx'); x.type='button';
+      x.textContent = off ? '↺' : '✕';
+      x.title = off ? 'Turn back on' : 'Turn off (not a day off for me)';
+      x.onclick = () => {
+        draft.hiddenHolidays = off ? (draft.hiddenHolidays || []).filter(d => d !== h.key)
+                                   : [...(draft.hiddenHolidays || []), h.key];
+        drawRegion();
+      };
+      c.append(dd, nn, x);
+      rhChips.appendChild(c);
+    });
+  };
+  rhYearSel.onchange = drawRegion;
+  if (g('set-country')) g('set-country').addEventListener('change', drawRegion);
+  drawRegion();
 
   // --- Storage mode (local / Apps Script-no-OAuth / OAuth-advanced) ---
   body.appendChild(sectLabel('Where your data lives'));
