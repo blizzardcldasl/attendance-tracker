@@ -401,7 +401,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 // settings live in-app (no code editing). See enhancements/README.md.
 // ===========================================================================
 
-const APP_BUILD = '2026-10-01-h1';
+const APP_BUILD = '2026-10-01-c2';
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
 const LS_SETTINGS = 'az-tracker-settings-v1';
 const LS_ENTRIES  = 'az-tracker-entries-v1';
@@ -1129,19 +1129,32 @@ function render(){
   g('sElig').textContent = s.elig;
   const n = s.need;
   setVal('sNeed', n === 0 ? '✓' : String(n), n === 0 ? 'var(--teal-dk)' : n <= 3 ? 'var(--amber)' : 'var(--rose)');
-  g('sNeedSub').textContent = n === 0 ? 'Target met' : `${s.futureEl} eligible day${s.futureEl !== 1 ? 's' : ''} remaining`;
-  g('barConf').style.width = Math.min(cr, 100) + '%';
-  g('barConf').style.background = cr >= T ? '#22c55e' : cr >= Twarn ? '#f59e0b' : '#ef4444';
+  g('sNeedSub').textContent = n === 0 ? (s.cOff >= Math.ceil(s.elig * T / 100) ? 'Target met' : 'Covered by your plan') :`${s.futureEl} eligible day${s.futureEl !== 1 ? 's' : ''} remaining`;
+  // The compliance bar measures progress toward the FULL month: confirmed
+  // office days ÷ all eligible days in the month (projected adds planned).
+  // The "Confirmed Rate" card above stays a pace metric (÷ past days only);
+  // using it here showed 100% compliant after a single office day.
+  const mr = s.elig > 0 ? Math.round(s.cOff / s.elig * 100) : 0;
+  const required = Math.ceil(s.elig * T / 100);
+  const met = s.cOff >= required;
+  const can = (s.cOff + s.pOff + s.futureEl) >= required;
+  const barCol = met || pr >= T ? '#22c55e' : can ? '#f59e0b' : '#ef4444';
+  g('barConf').style.width = Math.min(mr, 100) + '%';
+  g('barConf').style.background = barCol;
   g('barProj').style.width = Math.min(pr, 100) + '%';
-  setVal('progPct', cr + '%', cr >= T ? 'var(--teal-dk)' : cr >= Twarn ? 'var(--amber)' : 'var(--rose)');
+  setVal('progPct', mr + '%', met ? 'var(--teal-dk)' : pr >= T ? 'var(--travel)' : can ? 'var(--amber)' : 'var(--rose)');
   const pn = g('progNote');
-  if (n === 0){
-    pn.innerHTML = `<strong style="color:var(--teal-dk)">✓ ${T}% requirement met for this month.</strong>`;
+  const progress = met
+    ? `<strong>${s.cOff}</strong> office days (${required} required)`
+    : `<strong>${s.cOff}</strong> of <strong>${required}</strong> office days done`;
+  if (met){
+    pn.innerHTML = `<strong style="color:var(--teal-dk)">✓ ${T}% requirement met for this month</strong> &middot; ${progress}`;
+  } else if (n === 0){
+    pn.innerHTML = `${progress} &middot; <strong style="color:var(--office)">On track — your planned office days cover the rest</strong>`;
   } else {
-    const can = (s.cOff + s.pOff + s.futureEl) >= Math.ceil(s.elig * T / 100);
-    pn.innerHTML = `<span style="color:var(--rose)">Need <strong>${n}</strong> more office day${n !== 1 ? 's' : ''}</span> &middot;
+    pn.innerHTML = `${progress} &middot; <span style="color:var(--rose)">Need <strong>${n}</strong> more office day${n !== 1 ? 's' : ''}</span> &middot;
       <span>${s.futureEl} eligible day${s.futureEl !== 1 ? 's' : ''} remaining</span> &middot;
-      <strong style="color:${can ? 'var(--office)' : 'var(--rose)'}">${can ? 'On track if plan holds' : 'At risk — review your plan'}</strong>`;
+      <strong style="color:${can ? 'var(--amber)' : 'var(--rose)'}">${can ? 'Still achievable — plan the rest' : 'At risk — not enough days left'}</strong>`;
   }
   const stale = getStalePlanned();
   const sb = g('staleBanner');
