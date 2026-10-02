@@ -80,6 +80,11 @@ Full deploy + troubleshooting walkthrough: [`apps-script/SMOKE-TEST.md`](apps-sc
   history immediately.
 - **Company / custom holidays** — add dates that should be excluded (your region's public
   holidays are already included automatically).
+- **Region holidays** — turn off any public holiday your employer doesn't give (✕ to turn
+  off, ↺ to restore). You can also just click a holiday on the calendar.
+- In a Google Sheet mode, holiday settings (region, turned-off and custom holidays) are
+  stored in a single `#holidays` row of the `Tracker` tab, so every device shares them.
+  Don't edit or delete that row by hand. No Apps Script redeploy is needed.
 - **Where your data lives** — switch storage modes (see §2).
 - **Backup & portability** — Export/Import JSON, or Export **Calendar (.ics)**.
 
