@@ -401,7 +401,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 // settings live in-app (no code editing). See enhancements/README.md.
 // ===========================================================================
 
-const APP_BUILD = '2026-10-01-c2';
+const APP_BUILD = '2026-10-02-s1';
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
 const LS_SETTINGS = 'az-tracker-settings-v1';
 const LS_ENTRIES  = 'az-tracker-entries-v1';
@@ -780,6 +780,7 @@ const LocalStore = {
   },
   async writeRow(k, type, note){ entries[k] = {type, note}; this._persist(); return null; },
   async clearRow(k){ delete entries[k]; this._persist(); },
+  async writeHolidays(){},   // settings already live in this device's storage
 };
 
 const SheetsStore = {
@@ -823,7 +824,10 @@ const SheetsStore = {
     const data = await this._req('GET',
       `/values/${enc(this.tab + '!A2:E')}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`);
     const next = {};
+    this.remoteHolidays = null; this.holRow = null;
     (data.values || []).forEach((row, i) => {
+      const hol = parseHolidayRow(row);
+      if (hol){ this.remoteHolidays = hol; this.holRow = i + 2; return; }
       const dateKey = normalizeDateCell(row[0]);
       const type = normalizeType(row[2]);
       if (!dateKey || !type) return;
@@ -849,6 +853,24 @@ const SheetsStore = {
   },
   async clearRow(k, row){
     if (row){ await this._req('POST', `/values/${enc(this.tab + '!A' + row + ':E' + row)}:clear`, null); }
+  },
+  async writeHolidays(payload){
+    this.holRow = await this._writeRaw(this.holRow,
+      [HOL_ROW_KEY, '', 'settings', JSON.stringify(payload), fullTimestamp()]);
+    this.remoteHolidays = payload;
+  },
+  async _writeRaw(existingRow, values){
+    if (existingRow){
+      await this._req('PUT',
+        `/values/${enc(this.tab + '!A' + existingRow + ':E' + existingRow)}?valueInputOption=RAW`,
+        {values: [values]});
+      return existingRow;
+    }
+    const res = await this._req('POST',
+      `/values/${enc(this.tab)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
+      {values: [values]});
+    const mr = res?.updates?.updatedRange?.match(/!A(\d+):/);
+    return mr ? parseInt(mr[1], 10) : null;
   },
 };
 
@@ -891,7 +913,10 @@ const AppsScriptStore = {
   async loadEntries(){
     const data = await this._call({action: 'load'});
     const next = {};
+    this.remoteHolidays = null;
     (data.values || []).forEach(row => {
+      const hol = parseHolidayRow(row);
+      if (hol){ this.remoteHolidays = hol; return; }
       const dateKey = normalizeDateCell(row[0]);   // 'Date' header → null, skipped
       const type = normalizeType(row[2]);
       if (!dateKey || !type) return;
@@ -907,6 +932,12 @@ const AppsScriptStore = {
   },
   async clearRow(k){
     await this._call({action: 'delete', date: k});
+  },
+  async writeHolidays(payload){
+    // Same upsert-by-key the date rows use; '#holidays' is its own key.
+    await this._call({action: 'upsert',
+      row: [HOL_ROW_KEY, '', 'settings', JSON.stringify(payload), fullTimestamp()]});
+    this.remoteHolidays = payload;
   },
 };
 
@@ -926,6 +957,7 @@ async function setupStore(){
 }
 
 async function afterConnect(){
+  Store.remoteHolidays = undefined;   // set by a successful loadEntries()
   try {
     await Store.loadEntries();
     setSync('ok', Store.mode === 'local' ? 'Local ✓' : 'Synced ✓');
@@ -933,7 +965,74 @@ async function afterConnect(){
     console.error('[load]', e);
     setSync('err', 'Load failed');
   }
+  try { if (Store.remoteHolidays !== undefined) await syncHolidaysOnLoad(); }
+  catch(e){ console.warn('[holidays] sync failed', e); }
   render();
+}
+
+// =============================================================
+// HOLIDAY SETTINGS SYNC — region, turned-off and custom holidays live in one
+// '#holidays' row of the Tracker tab (Type 'settings', JSON in Note), so every
+// device shares them. Uses the existing upsert-by-key, so no Apps Script
+// redeploy is needed; loadEntries() already skips non-date keys.
+// The Sheet wins once it has a row. A device's FIRST sync unions its local
+// turned-off/custom holidays in, so nothing set before this feature is lost.
+// =============================================================
+const HOL_ROW_KEY = '#holidays';
+const LS_HOL_SYNCED = 'az-tracker-holidays-synced-v1';
+function holidayPayload(s){
+  return {
+    country: s.country || 'US',
+    hiddenHolidays: [...new Set(s.hiddenHolidays || [])].sort(),
+    customHolidays: (s.customHolidays || []).slice().sort((a,b) => a.date.localeCompare(b.date)),
+  };
+}
+function parseHolidayRow(row){
+  if (!row || String(row[0]).trim() !== HOL_ROW_KEY) return null;
+  try {
+    const p = JSON.parse(row[3]);
+    if (p && typeof p === 'object') return holidayPayload(p);
+  } catch(e){ console.warn('[holidays] bad sheet row', e); }
+  return null;
+}
+async function syncHolidaysOnLoad(){
+  if (Store.mode === 'local' || !Store.ready) return;
+  const remote = Store.remoteHolidays || null;
+  const local = holidayPayload(settings);
+  let firstSync = true;
+  try { firstSync = !localStorage.getItem(LS_HOL_SYNCED); } catch(e){}
+  let next = remote;
+  if (!remote){
+    next = local;
+  } else if (firstSync){
+    const custom = {};
+    local.customHolidays.forEach(h => { custom[h.date] = h; });
+    remote.customHolidays.forEach(h => { custom[h.date] = h; });   // sheet wins per date
+    next = holidayPayload({
+      country: remote.country,
+      hiddenHolidays: [...remote.hiddenHolidays, ...local.hiddenHolidays],
+      customHolidays: Object.values(custom),
+    });
+  }
+  Object.assign(settings, next);
+  saveSettings();
+  buildHolidays();
+  const isDefault = !next.hiddenHolidays.length && !next.customHolidays.length;
+  if (JSON.stringify(next) !== JSON.stringify(remote) && !(isDefault && !remote)){
+    await Store.writeHolidays(next);
+  }
+  try { localStorage.setItem(LS_HOL_SYNCED, new Date().toISOString()); } catch(e){}
+}
+async function pushHolidays(){
+  if (Store.mode === 'local' || !Store.ready) return;
+  try {
+    setSync('busy', 'Saving holidays…');
+    await Store.writeHolidays(holidayPayload(settings));
+    setSync('ok', 'Synced ✓');
+  } catch(e){
+    console.error('[holidays] save failed', e);
+    setSync('err', 'Holiday sync failed');
+  }
 }
 
 // =============================================================
@@ -1034,13 +1133,15 @@ function offerUnholiday(k){
   const custom = ht === 'Company' && (settings.customHolidays || []).some(h => h.date === k);
   const ok = confirm(`${k} is marked as a holiday: ${hn}${ht ? ' (' + ht + ')' : ''}.\n\n` +
     `Not a day off for you? Press OK to turn this holiday off so you can log the day.\n` +
-    `(You can turn it back on in Settings → Holidays.)`);
+    `(You can turn it back on in Settings → Region holidays.` +
+    (settings.storageMode !== 'local' ? ` This applies on all your devices.)` : `)`));
   if (!ok) return false;
   if (custom) settings.customHolidays = settings.customHolidays.filter(h => h.date !== k);
   else settings.hiddenHolidays = [...new Set([...(settings.hiddenHolidays || []), k])];
   saveSettings();
   buildHolidays();
   render();
+  pushHolidays();
   return !isHol(k);
 }
 function quickCycle(k){
@@ -1501,7 +1602,8 @@ function openSettings(fromOnboarding){
   drawStatuses();
 
   // --- Custom holidays ---
-  body.appendChild(sectLabel('Company / custom holidays (excluded from compliance)'));
+  const holSync = draft.storageMode !== 'local' ? ' · synced to your Sheet' : '';
+  body.appendChild(sectLabel('Company / custom holidays (excluded from compliance)' + holSync));
   const chips = mk('div','chips'); body.appendChild(chips);
   const add = mk('div','add-hol');
   add.innerHTML = `<input type="date" id="ch-date"><input type="text" id="ch-name" placeholder="Holiday name">`;
@@ -1533,7 +1635,7 @@ function openSettings(fromOnboarding){
   drawChips();
 
   // --- Region holidays (turn off ones your employer doesn't give) ---
-  body.appendChild(sectLabel('Region holidays · turn off any you don\'t get'));
+  body.appendChild(sectLabel('Region holidays · turn off any you don\'t get' + holSync));
   const rhYearSel = mk('select');
   rhYearSel.style.cssText = 'align-self:flex-start;padding:6px 8px;font-size:12px;background:#FAF8F4;border:1.5px solid var(--border);border-radius:var(--r-sm);';
   [viewY - 1, viewY, viewY + 1].forEach(yr => { const o = mk('option'); o.value = yr; o.textContent = yr; if (yr === viewY) o.selected = true; rhYearSel.appendChild(o); });
@@ -1641,12 +1743,16 @@ function openSettings(fromOnboarding){
     const modeChanged = draft.storageMode !== settings.storageMode
       || draft.sheetId !== settings.sheetId || draft.clientId !== settings.clientId
       || draft.scriptUrl !== settings.scriptUrl || draft.scriptToken !== settings.scriptToken;
+    const holChanged = JSON.stringify(holidayPayload(draft)) !== JSON.stringify(holidayPayload(settings));
     settings = draft;
     saveSettings();
     buildStatusIndex();
     hideModal();
     if (modeChanged){ SheetsStore.ready = false; SheetsStore.token = null; AppsScriptStore.ready = false; setupStore(); }
-    else { applySettings(); buildHolidays(); syncHeaderChrome(); render(); }
+    else {
+      applySettings(); buildHolidays(); syncHeaderChrome(); render();
+      if (holChanged) pushHolidays();
+    }
   };
   foot.append(cancel, save);
   showModal();
